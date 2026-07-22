@@ -3,6 +3,7 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/useAuth'
 import { appRoutes, findRouteByPath } from '../router/routes'
+import './MainLayout.css'
 
 const { Content, Header, Sider } = Layout
 const { Text } = Typography
@@ -63,9 +64,17 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   ]
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} width={216}>
-        <div style={{ color: '#fff', fontSize: 18, fontWeight: 600, height: 56, padding: '16px 20px' }}>
+    <Layout className="main-layout">
+      <Sider
+        breakpoint="md"
+        className="main-layout__sider"
+        collapsible
+        collapsed={collapsed}
+        collapsedWidth={72}
+        onCollapse={setCollapsed}
+        width={216}
+      >
+        <div className="main-layout__brand">
           {collapsed ? 'OA' : 'OA 办公'}
         </div>
         <Menu
@@ -76,31 +85,23 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           theme="dark"
         />
       </Sider>
-      <Layout>
-        <Header
-          style={{
-            alignItems: 'center',
-            background: '#fff',
-            borderBottom: '1px solid #f0f0f0',
-            display: 'flex',
-            justifyContent: 'space-between',
-            padding: '0 24px',
-          }}
-        >
+      <Layout className="main-layout__body">
+        <Header className="main-layout__header">
           <Breadcrumb
+            className="main-layout__breadcrumb"
             items={[
               { title: <Link to="/">首页</Link> },
               ...(currentRoute && currentRoute.path !== '/' ? [{ title: currentRoute.title }] : []),
             ]}
           />
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-            <Button type="text">
+            <Button className="main-layout__user-button" type="text">
               <Text strong>{currentUser?.displayName ?? currentUser?.username ?? '用户'}</Text>
             </Button>
           </Dropdown>
         </Header>
-        <Content style={{ background: '#f5f7fb', minHeight: 0, padding: 24 }}>
-          <div style={{ background: '#fff', borderRadius: 8, minHeight: 360, padding: 24 }}>{children}</div>
+        <Content className="main-layout__content">
+          <div className="main-layout__panel">{children}</div>
         </Content>
       </Layout>
     </Layout>
