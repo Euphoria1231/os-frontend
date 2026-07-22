@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react'
 import Home from '../views/Home'
 import Login from '../views/Login'
+import Departments from '../views/System/Departments'
 import SystemPlaceholder from '../views/System/Placeholder'
+import Positions from '../views/System/Positions'
 
 export interface AppRoute {
   element: ReactNode
@@ -20,14 +22,14 @@ export const appRoutes: AppRoute[] = [
     title: '首页',
   },
   {
-    element: <SystemPlaceholder title="部门管理" />,
+    element: <Departments />,
     key: 'system-departments',
     path: '/system/departments',
     permissionCode: 'system:department:list',
     title: '部门管理',
   },
   {
-    element: <SystemPlaceholder title="岗位管理" />,
+    element: <Positions />,
     key: 'system-positions',
     path: '/system/positions',
     permissionCode: 'system:position:list',
