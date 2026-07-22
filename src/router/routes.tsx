@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import Home from '../views/Home'
 import Login from '../views/Login'
 import Departments from '../views/System/Departments'
+import Employees from '../views/System/Employees'
 import SystemPlaceholder from '../views/System/Placeholder'
 import Positions from '../views/System/Positions'
 
@@ -36,7 +37,7 @@ export const appRoutes: AppRoute[] = [
     title: '岗位管理',
   },
   {
-    element: <SystemPlaceholder title="员工管理" />,
+    element: <Employees />,
     key: 'system-employees',
     path: '/system/employees',
     permissionCode: 'system:employee:list',
