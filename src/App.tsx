@@ -2,6 +2,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import RequireAuth from './components/auth/RequireAuth'
 import RequirePermission from './components/auth/RequirePermission'
+import AppErrorBoundary from './components/error/AppErrorBoundary'
 import { AuthProvider } from './contexts/AuthContext'
 import MainLayout from './layouts/MainLayout'
 import { appRoutes, publicRoutes } from './router/routes'
@@ -23,9 +24,11 @@ function App() {
               element={
                 <RequireAuth>
                   <MainLayout>
-                    <RequirePermission permissionCode={route.permissionCode} fallback={<Forbidden />}>
-                      {route.element}
-                    </RequirePermission>
+                    <AppErrorBoundary>
+                      <RequirePermission permissionCode={route.permissionCode} fallback={<Forbidden />}>
+                        {route.element}
+                      </RequirePermission>
+                    </AppErrorBoundary>
                   </MainLayout>
                 </RequireAuth>
               }
@@ -36,7 +39,9 @@ function App() {
             element={
               <RequireAuth>
                 <MainLayout>
-                  <NotFound />
+                  <AppErrorBoundary>
+                    <NotFound />
+                  </AppErrorBoundary>
                 </MainLayout>
               </RequireAuth>
             }
