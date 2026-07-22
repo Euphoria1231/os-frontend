@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react'
 import Home from '../views/Home'
 import Login from '../views/Login'
+import ApiPermissions from '../views/System/ApiPermissions'
 import Departments from '../views/System/Departments'
 import Employees from '../views/System/Employees'
-import SystemPlaceholder from '../views/System/Placeholder'
+import Menus from '../views/System/Menus'
 import Positions from '../views/System/Positions'
+import Roles from '../views/System/Roles'
 
 export interface AppRoute {
   element: ReactNode
@@ -44,21 +46,21 @@ export const appRoutes: AppRoute[] = [
     title: '员工管理',
   },
   {
-    element: <SystemPlaceholder title="角色管理" />,
+    element: <Roles />,
     key: 'system-roles',
     path: '/system/roles',
     permissionCode: 'system:role:list',
     title: '角色管理',
   },
   {
-    element: <SystemPlaceholder title="菜单管理" />,
+    element: <Menus />,
     key: 'system-menus',
     path: '/system/menus',
     permissionCode: 'system:menu:list',
     title: '菜单管理',
   },
   {
-    element: <SystemPlaceholder title="接口权限" />,
+    element: <ApiPermissions />,
     key: 'system-api-permissions',
     path: '/system/api-permissions',
     permissionCode: 'system:api-permission:list',
