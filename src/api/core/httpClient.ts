@@ -23,6 +23,11 @@ export interface CreateHttpClientOptions {
   tokenProvider?: TokenProvider
 }
 
+export interface HttpClientAuthOptions {
+  onUnauthorized?: UnauthorizedHandler
+  tokenProvider?: TokenProvider
+}
+
 export interface HttpClient {
   defaults: AxiosInstance['defaults']
   delete<T>(url: string, config?: AxiosRequestConfig): Promise<T>
@@ -47,6 +52,19 @@ export class ApiClientError extends Error {
 
 export const isApiClientError = (error: unknown): error is ApiClientError =>
   error instanceof ApiClientError
+
+let defaultTokenProvider: TokenProvider | undefined
+let defaultUnauthorizedHandler: UnauthorizedHandler | undefined
+
+export const setHttpClientAuth = (options: HttpClientAuthOptions) => {
+  defaultTokenProvider = options.tokenProvider
+  defaultUnauthorizedHandler = options.onUnauthorized
+}
+
+export const clearHttpClientAuth = () => {
+  defaultTokenProvider = undefined
+  defaultUnauthorizedHandler = undefined
+}
 
 const resolveApiBaseUrl = (baseURL?: string): string => {
   const configuredBaseURL = baseURL ?? import.meta.env.VITE_API_BASE_URL
@@ -128,15 +146,19 @@ export const createHttpClient = (options: CreateHttpClientOptions = {}): HttpCli
     timeout: 10000,
   })
 
-  axiosInstance.interceptors.request.use((config) => injectToken(config, options.tokenProvider))
+  axiosInstance.interceptors.request.use((config) =>
+    injectToken(config, options.tokenProvider ?? defaultTokenProvider),
+  )
 
   const request = async <T>(config: AxiosRequestConfig): Promise<T> => {
+    const onUnauthorized = options.onUnauthorized ?? defaultUnauthorizedHandler
+
     try {
       const response = await axiosInstance.request<ApiResponse<T>>(config)
 
-      return normalizeApiResponse<T>(response, options.onUnauthorized)
+      return normalizeApiResponse<T>(response, onUnauthorized)
     } catch (error) {
-      throw normalizeRequestError(error, options.onUnauthorized)
+      throw normalizeRequestError(error, onUnauthorized)
     }
   }
 
