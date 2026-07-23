@@ -1,0 +1,267 @@
+@import './styles/tokens.less';
+
+.foundation-page {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 12%, fade(@color-accent, 14%) 0, transparent 28%),
+    linear-gradient(145deg, @color-navy-950 0%, @color-navy-900 42%, @color-navy-800 100%);
+  color: @color-white;
+
+  &::before,
+  &::after {
+    position: absolute;
+    border: 1px solid fade(@color-white, 8%);
+    border-radius: 50%;
+    content: '';
+    pointer-events: none;
+  }
+
+  &::before {
+    top: -280px;
+    right: -160px;
+    width: 620px;
+    height: 620px;
+  }
+
+  &::after {
+    right: 180px;
+    bottom: -360px;
+    width: 540px;
+    height: 540px;
+  }
+}
+
+.foundation-header,
+.foundation-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(1180px, calc(100% - 64px));
+  margin: 0 auto;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.foundation-header {
+  padding: 28px 0;
+  border-bottom: 1px solid fade(@color-white, 10%);
+
+  .ant-badge-status-text {
+    color: fade(@color-white, 72%);
+    font-size: 13px;
+  }
+}
+
+.foundation-logo {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  border: 1px solid fade(@color-white, 30%);
+  border-radius: 12px;
+  background: fade(@color-white, 8%);
+  color: @color-white;
+  font-family: @font-display;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  place-items: center;
+}
+
+.foundation-brand,
+.foundation-brand-subtitle {
+  display: block;
+}
+
+.foundation-brand {
+  color: @color-white;
+  font-family: @font-display;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.foundation-brand-subtitle {
+  margin-top: 2px;
+  color: fade(@color-white, 54%);
+  font-size: 12px;
+}
+
+.foundation-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(1180px, calc(100% - 64px));
+  margin: auto;
+  padding: 72px 0;
+  align-items: center;
+  gap: 88px;
+  grid-template-columns: minmax(0, 1.08fr) minmax(380px, 0.92fr);
+}
+
+.foundation-intro {
+  max-width: 670px;
+
+  h1.ant-typography {
+    max-width: 640px;
+    margin: 24px 0 20px;
+    color: @color-white;
+    font-family: @font-display;
+    font-size: clamp(44px, 5.4vw, 72px);
+    font-weight: 650;
+    letter-spacing: -0.045em;
+    line-height: 1.08;
+  }
+
+  p.ant-typography {
+    max-width: 610px;
+    margin-bottom: 28px;
+    color: fade(@color-white, 66%);
+    font-size: 16px;
+    line-height: 1.85;
+  }
+
+  .ant-tag:not(.foundation-kicker) {
+    margin-inline-end: 0;
+    padding: 4px 10px;
+    border-color: fade(@color-white, 16%);
+    background: fade(@color-white, 6%);
+    color: fade(@color-white, 72%);
+  }
+}
+
+.foundation-kicker {
+  margin: 0;
+  padding: 5px 11px;
+  background: fade(@color-accent, 16%);
+  color: @color-accent-200;
+  font-family: @font-display;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.foundation-card.ant-card {
+  border: 1px solid fade(@color-white, 16%);
+  border-radius: 24px;
+  background: fade(@color-white, 96%);
+  box-shadow: 0 28px 80px fade(#020a12, 34%);
+
+  .ant-card-body {
+    padding: 34px;
+  }
+
+  h3.ant-typography {
+    margin: 8px 0 8px;
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+  }
+
+  p.ant-typography {
+    margin: 0;
+    color: @color-slate-500;
+    line-height: 1.7;
+  }
+}
+
+.foundation-card-eyebrow {
+  color: @color-accent-700;
+  font-family: @font-display;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.foundation-progress {
+  padding: 20px;
+  border-radius: 16px;
+  background: @color-slate-50;
+
+  .ant-progress {
+    margin-top: 10px;
+  }
+}
+
+.foundation-capabilities {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid @color-slate-200;
+  border-radius: 16px;
+  background: @color-slate-200;
+
+  > div {
+    display: flex;
+    padding: 15px 18px;
+    align-items: center;
+    justify-content: space-between;
+    background: @color-white;
+  }
+
+  .ant-typography-secondary {
+    font-size: 12px;
+  }
+}
+
+.foundation-footer {
+  padding: 22px 0 28px;
+  border-top: 1px solid fade(@color-white, 10%);
+
+  .ant-typography {
+    color: fade(@color-white, 42%);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+}
+
+@media (max-width: 900px) {
+  .foundation-content {
+    padding: 56px 0;
+    gap: 44px;
+    grid-template-columns: 1fr;
+  }
+
+  .foundation-intro h1.ant-typography {
+    font-size: clamp(40px, 10vw, 60px);
+  }
+}
+
+@media (max-width: 600px) {
+  .foundation-header,
+  .foundation-content,
+  .foundation-footer {
+    width: min(100% - 36px, 1180px);
+  }
+
+  .foundation-header {
+    padding: 20px 0;
+
+    > .ant-badge {
+      display: none;
+    }
+  }
+
+  .foundation-content {
+    padding: 40px 0;
+  }
+
+  .foundation-intro h1.ant-typography {
+    margin-top: 18px;
+    font-size: 38px;
+  }
+
+  .foundation-card.ant-card .ant-card-body {
+    padding: 24px;
+  }
+
+  .foundation-capabilities > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
