@@ -3,6 +3,7 @@ import {
   ArrowRightOutlined,
   BellOutlined,
   ClockCircleOutlined,
+  RadarChartOutlined,
   SolutionOutlined,
   TeamOutlined,
   UnorderedListOutlined,
@@ -27,7 +28,7 @@ import { getErrorMessage } from '../../utils/error.ts'
 import { WeatherWidget } from './WeatherWidget.tsx'
 import './WorkbenchPage.less'
 
-const { Paragraph, Text, Title } = Typography
+const { Paragraph, Title } = Typography
 
 const moduleCards = [
   {
@@ -95,6 +96,11 @@ export const WorkbenchPage = memo(function WorkbenchPage() {
                 {getGreeting()}，{user?.realName ?? '同事'}
               </Title>
               <Paragraph>{dateLabel}，欢迎回到你的办公工作台。</Paragraph>
+              <Link to="/dashboard" className="workbench-dashboard-entry">
+                <RadarChartOutlined />
+                <span>查看企业数据驾驶舱</span>
+                <ArrowRightOutlined />
+              </Link>
             </div>
             <WeatherWidget />
           </section>

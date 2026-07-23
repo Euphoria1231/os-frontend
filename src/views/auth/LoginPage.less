@@ -239,6 +239,38 @@
   font-weight: 600;
 }
 
+.login-dashboard-entry {
+  display: flex;
+  width: 100%;
+  min-height: 46px;
+  margin-top: 14px;
+  padding: 0 16px;
+  border: 1px solid fade(@color-accent, 22%);
+  border-radius: 11px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  background: fade(@color-accent, 5%);
+  color: @color-navy-800;
+  font-size: 13px;
+  font-weight: 600;
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease,
+    transform 180ms ease;
+
+  .anticon:last-child {
+    margin-left: 2px;
+    font-size: 11px;
+  }
+
+  &:hover,
+  &:focus-visible {
+    border-color: fade(@color-accent, 48%);
+    background: fade(@color-accent, 10%);
+    color: @color-accent-700;
+    transform: translateY(-1px);
+  }
+}
+
 .login-security-note {
   margin-top: 28px;
   align-items: center;

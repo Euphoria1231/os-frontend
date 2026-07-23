@@ -11,6 +11,7 @@ import { DepartmentPage } from './views/organization/DepartmentPage.tsx'
 import { PositionPage } from './views/organization/PositionPage.tsx'
 import { NoticePage } from './views/notice/NoticePage.tsx'
 import { PermissionPage } from './views/permission/PermissionPage.tsx'
+import { DashboardPage } from './views/dashboard/DashboardPage.tsx'
 import { WorkbenchPage } from './views/workbench/WorkbenchPage.tsx'
 import { IntelligencePage } from './views/intelligence/IntelligencePage.tsx'
 
@@ -19,6 +20,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route
           path="/"
           element={

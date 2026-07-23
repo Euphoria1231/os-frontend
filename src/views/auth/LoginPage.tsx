@@ -3,12 +3,13 @@ import {
   ApartmentOutlined,
   ArrowRightOutlined,
   ClockCircleOutlined,
+  FundProjectionScreenOutlined,
   LockOutlined,
   SafetyCertificateOutlined,
   UserOutlined,
 } from '@ant-design/icons'
 import { App, Button, Flex, Form, Input, Space, Tag, Typography } from 'antd'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
 import { RequestError } from '../../services/request.ts'
 import type { LoginRequest } from '../../services/auth/auth.types.ts'
@@ -144,6 +145,12 @@ export const LoginPage = memo(function LoginPage() {
               进入工作台
             </Button>
           </Form>
+
+          <Link to="/dashboard" className="login-dashboard-entry">
+            <FundProjectionScreenOutlined />
+            <span>免登录查看企业数据大屏</span>
+            <ArrowRightOutlined />
+          </Link>
 
           <Flex justify="center" className="login-security-note">
             <SafetyCertificateOutlined />
