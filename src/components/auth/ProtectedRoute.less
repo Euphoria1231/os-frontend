@@ -1,0 +1,28 @@
+@import '../../styles/tokens.less';
+
+.auth-loading-page {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 18px;
+  background:
+    radial-gradient(circle at 50% 35%, fade(@color-accent, 10%), transparent 28%),
+    @color-slate-50;
+}
+
+.auth-loading-logo {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: @color-navy-900;
+  box-shadow: 0 14px 32px fade(@color-navy-900, 24%);
+  color: @color-white;
+  font-family: @font-display;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  place-items: center;
+}

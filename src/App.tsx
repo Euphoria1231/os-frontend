@@ -1,6 +1,8 @@
 import { memo } from 'react'
 import { Badge, Card, Flex, Progress, Space, Tag, Typography } from 'antd'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx'
+import { LoginPage } from './views/auth/LoginPage.tsx'
 import './App.less'
 
 const { Paragraph, Text, Title } = Typography
@@ -84,7 +86,15 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/foundation" element={<FoundationPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/foundation"
+          element={
+            <ProtectedRoute>
+              <FoundationPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Navigate to="/foundation" replace />} />
       </Routes>
     </BrowserRouter>
