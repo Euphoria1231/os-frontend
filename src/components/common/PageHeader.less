@@ -1,0 +1,42 @@
+@import '../../styles/tokens.less';
+
+.page-header {
+  margin-bottom: 22px;
+
+  h2.ant-typography {
+    margin: 5px 0 7px;
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 28px;
+    letter-spacing: -0.025em;
+  }
+
+  p.ant-typography {
+    margin: 0;
+    color: @color-slate-500;
+  }
+}
+
+.page-header-eyebrow {
+  color: @color-accent-700;
+  font-family: @font-display;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+.page-header-extra {
+  flex: none;
+}
+
+@media (max-width: 640px) {
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .page-header-extra,
+  .page-header-extra .ant-btn {
+    width: 100%;
+  }
+}

@@ -3,22 +3,12 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx'
 import { AppLayout } from './components/layout/AppLayout.tsx'
 import { PermissionGate } from './components/permission/PermissionGate.tsx'
 import { LoginPage } from './views/auth/LoginPage.tsx'
+import { DepartmentPage } from './views/organization/DepartmentPage.tsx'
+import { PositionPage } from './views/organization/PositionPage.tsx'
 import { ModulePlaceholder } from './views/shared/ModulePlaceholder.tsx'
 import { WorkbenchPage } from './views/workbench/WorkbenchPage.tsx'
 
 const moduleRoutes = [
-  {
-    path: 'organization/departments',
-    authority: 'GET:/api/user/**',
-    title: '部门管理',
-    description: '维护组织层级、部门负责人和启停状态。',
-  },
-  {
-    path: 'organization/positions',
-    authority: 'GET:/api/user/**',
-    title: '岗位管理',
-    description: '维护岗位编码、岗位名称和岗位状态。',
-  },
   {
     path: 'employees',
     authority: 'GET:/api/user/**',
@@ -72,6 +62,22 @@ function App() {
         >
           <Route index element={<Navigate to="/workspace" replace />} />
           <Route path="workspace" element={<WorkbenchPage />} />
+          <Route
+            path="organization/departments"
+            element={
+              <PermissionGate authority="GET:/api/user/**" showDenied>
+                <DepartmentPage />
+              </PermissionGate>
+            }
+          />
+          <Route
+            path="organization/positions"
+            element={
+              <PermissionGate authority="GET:/api/user/**" showDenied>
+                <PositionPage />
+              </PermissionGate>
+            }
+          />
           {moduleRoutes.map((route) => (
             <Route
               key={route.path}
