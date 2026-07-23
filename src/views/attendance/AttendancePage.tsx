@@ -3,9 +3,8 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
+  EnvironmentOutlined,
   FormOutlined,
-  LoginOutlined,
-  LogoutOutlined,
   ReloadOutlined,
 } from '@ant-design/icons'
 import {
@@ -37,11 +36,19 @@ import { useApplications } from '../../hooks/flow/useApplications.ts'
 import { attendanceService } from '../../services/attendance/attendance.service.ts'
 import type {
   AttendanceRecord,
+  ClockLocation,
   MakeupQuota,
 } from '../../services/attendance/attendance.types.ts'
 import { RequestError } from '../../services/request.ts'
 import { formatDateTime } from '../../utils/date.ts'
 import { getErrorMessage } from '../../utils/error.ts'
+import {
+  calculateDistanceMeters,
+  formatClockTime,
+  isInsideGeofence,
+  resolveClockAction,
+  type ClockAction,
+} from './clock.logic.ts'
 import {
   buildMakeupApplicationRequest,
   resolveMakeupActionState,
@@ -67,6 +74,38 @@ interface MakeupFormValues {
   reason: string
 }
 
+type LocationStatus = 'idle' | 'locating' | 'inside' | 'outside' | 'error'
+
+interface ClockLocationState {
+  status: LocationStatus
+  point: ClockLocation | null
+  accuracyMeters: number | null
+  distanceMeters: number | null
+  errorMessage: string | null
+}
+
+const INITIAL_LOCATION_STATE: ClockLocationState = {
+  status: 'idle',
+  point: null,
+  accuracyMeters: null,
+  distanceMeters: null,
+  errorMessage: null,
+}
+
+const CLOCK_ACTION_LABELS: Record<ClockAction, string> = {
+  CLOCK_IN: '上班打卡',
+  CLOCK_OUT: '下班打卡',
+  COMPLETED: '今日打卡已完成',
+}
+
+const LOCATION_TITLES: Record<LocationStatus, string> = {
+  idle: '准备获取当前位置',
+  locating: '正在验证打卡位置',
+  inside: '当前位置符合打卡范围',
+  outside: '当前位置超出打卡范围',
+  error: '暂时无法验证位置',
+}
+
 async function getMakeupQuotaOrNull(quotaMonth: string): Promise<MakeupQuota | null> {
   try {
     return await attendanceService.getMyMakeupQuota(quotaMonth)
@@ -86,6 +125,10 @@ export const AttendancePage = memo(function AttendancePage() {
     dayjs().endOf('month'),
   ])
   const [submitting, setSubmitting] = useState<'in' | 'out' | null>(null)
+  const [clockModalOpen, setClockModalOpen] = useState(false)
+  const [locationState, setLocationState] = useState<ClockLocationState>(
+    INITIAL_LOCATION_STATE,
+  )
   const [makeupTarget, setMakeupTarget] = useState<AttendanceRecord | null>(null)
   const [makeupModalOpen, setMakeupModalOpen] = useState(false)
   const [makeupSubmitting, setMakeupSubmitting] = useState(false)
@@ -94,7 +137,16 @@ export const AttendancePage = memo(function AttendancePage() {
   const [quotaByMonth, setQuotaByMonth] = useState<Record<string, MakeupQuota | null>>({})
   const { message } = App.useApp()
   const { user, hasAuthority } = useAuth()
-  const { today, records, loading, error, reload, clockIn, clockOut } = useAttendance(
+  const {
+    today,
+    records,
+    clockConfig,
+    loading,
+    error,
+    reload,
+    clockIn,
+    clockOut,
+  } = useAttendance(
     range[0].format('YYYY-MM-DD'),
     range[1].format('YYYY-MM-DD'),
   )
@@ -113,6 +165,7 @@ export const AttendancePage = memo(function AttendancePage() {
     ? dayjs(makeupTarget.attendanceDate).format('YYYY-MM')
     : currentMonth
   const targetQuota = quotaByMonth[makeupTargetMonth]
+  const clockAction = resolveClockAction(today)
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000)
@@ -146,25 +199,110 @@ export const AttendancePage = memo(function AttendancePage() {
     }
   }, [currentMonth])
 
-  const handleClockIn = async () => {
-    setSubmitting('in')
-    try {
-      const record = await clockIn()
-      message.success(`上班打卡成功：${formatTime(record.clockInTime)}`)
-    } catch (requestError) {
-      message.error(getErrorMessage(requestError, '上班打卡失败'))
-    } finally {
-      setSubmitting(null)
+  const locateForClock = () => {
+    if (!clockConfig) {
+      setLocationState({
+        ...INITIAL_LOCATION_STATE,
+        status: 'error',
+        errorMessage: '打卡配置尚未加载，请稍后重试',
+      })
+      return
     }
+    if (!window.isSecureContext && window.location.hostname !== 'localhost') {
+      setLocationState({
+        ...INITIAL_LOCATION_STATE,
+        status: 'error',
+        errorMessage: '浏览器仅允许在 HTTPS 或 localhost 页面获取位置',
+      })
+      return
+    }
+    if (!navigator.geolocation) {
+      setLocationState({
+        ...INITIAL_LOCATION_STATE,
+        status: 'error',
+        errorMessage: '当前浏览器不支持位置定位',
+      })
+      return
+    }
+
+    setLocationState({ ...INITIAL_LOCATION_STATE, status: 'locating' })
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const point = {
+          longitude: position.coords.longitude,
+          latitude: position.coords.latitude,
+        }
+        const distanceMeters = calculateDistanceMeters(
+          {
+            longitude: clockConfig.centerLongitude,
+            latitude: clockConfig.centerLatitude,
+          },
+          point,
+        )
+        setLocationState({
+          status: isInsideGeofence(distanceMeters, clockConfig.radiusMeters)
+            ? 'inside'
+            : 'outside',
+          point,
+          accuracyMeters: position.coords.accuracy,
+          distanceMeters,
+          errorMessage: null,
+        })
+      },
+      (positionError) => {
+        const errorMessage = positionError.code === positionError.PERMISSION_DENIED
+          ? '定位权限被拒绝，请在浏览器设置中允许位置访问'
+          : positionError.code === positionError.TIMEOUT
+            ? '定位超时，请移动到开阔区域后重试'
+            : '暂时无法获取当前位置，请稍后重试'
+        setLocationState({
+          ...INITIAL_LOCATION_STATE,
+          status: 'error',
+          errorMessage,
+        })
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10_000,
+        maximumAge: 0,
+      },
+    )
   }
 
-  const handleClockOut = async () => {
-    setSubmitting('out')
+  const openClockModal = () => {
+    setClockModalOpen(true)
+    locateForClock()
+  }
+
+  const closeClockModal = () => {
+    if (submitting) return
+    setClockModalOpen(false)
+    setLocationState(INITIAL_LOCATION_STATE)
+  }
+
+  const handleClockSubmit = async () => {
+    if (
+      clockAction === 'COMPLETED'
+      || !locationState.point
+      || locationState.status !== 'inside'
+    ) return
+
+    const isClockIn = clockAction === 'CLOCK_IN'
+    setSubmitting(isClockIn ? 'in' : 'out')
     try {
-      const record = await clockOut()
-      message.success(`下班打卡成功：${formatTime(record.clockOutTime)}`)
+      const record = isClockIn
+        ? await clockIn(locationState.point)
+        : await clockOut(locationState.point)
+      const clockTime = isClockIn ? record.clockInTime : record.clockOutTime
+      message.success(
+        `${isClockIn ? '上班' : '下班'}打卡成功：${formatTime(clockTime)}`,
+      )
+      setClockModalOpen(false)
+      setLocationState(INITIAL_LOCATION_STATE)
     } catch (requestError) {
-      message.error(getErrorMessage(requestError, '下班打卡失败'))
+      message.error(
+        getErrorMessage(requestError, `${isClockIn ? '上班' : '下班'}打卡失败`),
+      )
     } finally {
       setSubmitting(null)
     }
@@ -315,6 +453,20 @@ export const AttendancePage = memo(function AttendancePage() {
   const lateCount = records.filter((record) => record.attendanceStatus === 'LATE').length
   const completedCount = records.filter((record) => record.clockInTime && record.clockOutTime).length
   const pageError = error ?? applicationsError ?? quotaError
+  const clockActionLabel = CLOCK_ACTION_LABELS[clockAction]
+  const morningSchedule = clockConfig
+    ? `${clockConfig.morningStartTime}–${clockConfig.morningEndTime}`
+    : '—'
+  const afternoonSchedule = clockConfig
+    ? `${clockConfig.afternoonStartTime}–${clockConfig.afternoonEndTime}`
+    : '—'
+  const locationDescription = locationState.status === 'locating'
+    ? '请保持页面开启，系统正在请求设备定位。'
+    : locationState.status === 'inside' && locationState.distanceMeters !== null
+      ? `距打卡中心约 ${Math.round(locationState.distanceMeters)} 米，可以提交打卡。`
+      : locationState.status === 'outside' && locationState.distanceMeters !== null
+        ? `距打卡中心约 ${Math.round(locationState.distanceMeters)} 米，请进入规定区域后重试。`
+        : locationState.errorMessage ?? '点击重新定位以验证是否处于规定区域。'
   const dateLabel = new Intl.DateTimeFormat('zh-CN', {
     year: 'numeric',
     month: 'long',
@@ -343,42 +495,63 @@ export const AttendancePage = memo(function AttendancePage() {
           </Typography.Paragraph>
         </div>
 
-        <div className="attendance-today-status">
-          <div>
-            <span><LoginOutlined /></span>
-            <Typography.Text>上班时间</Typography.Text>
-            <Typography.Title level={4}>{formatTime(today?.clockInTime ?? null)}</Typography.Title>
+        <div className="attendance-time-board">
+          <div className="attendance-time-row attendance-time-row-schedule">
+            <div className="attendance-time-row-label">
+              <span><ClockCircleOutlined /></span>
+              <div>
+                <Typography.Text>规定工作时间</Typography.Text>
+                <Typography.Text type="secondary">每日固定时段</Typography.Text>
+              </div>
+            </div>
+            <div className="attendance-time-slot">
+              <Typography.Text>上午</Typography.Text>
+              <Typography.Title level={4}>{morningSchedule}</Typography.Title>
+            </div>
+            <div className="attendance-time-slot">
+              <Typography.Text>下午</Typography.Text>
+              <Typography.Title level={4}>{afternoonSchedule}</Typography.Title>
+            </div>
           </div>
-          <i />
-          <div>
-            <span><LogoutOutlined /></span>
-            <Typography.Text>下班时间</Typography.Text>
-            <Typography.Title level={4}>{formatTime(today?.clockOutTime ?? null)}</Typography.Title>
+          <div className="attendance-time-row">
+            <div className="attendance-time-row-label">
+              <span><CheckCircleOutlined /></span>
+              <div>
+                <Typography.Text>今日打卡时间</Typography.Text>
+                <Typography.Text type="secondary">实际记录</Typography.Text>
+              </div>
+            </div>
+            <div className="attendance-time-slot">
+              <Typography.Text>上班打卡</Typography.Text>
+              <Typography.Title level={4}>
+                {formatClockTime(today?.clockInTime)}
+              </Typography.Title>
+            </div>
+            <div className="attendance-time-slot">
+              <Typography.Text>下班打卡</Typography.Text>
+              <Typography.Title level={4}>
+                {formatClockTime(today?.clockOutTime)}
+              </Typography.Title>
+            </div>
           </div>
         </div>
 
         {canClock && (
-          <Space className="attendance-clock-actions" size={12}>
+          <div className="attendance-clock-actions">
             <Button
               type="primary"
               size="large"
-              icon={<LoginOutlined />}
-              disabled={Boolean(today?.clockInTime)}
-              loading={submitting === 'in'}
-              onClick={() => void handleClockIn()}
+              icon={<EnvironmentOutlined />}
+              disabled={clockAction === 'COMPLETED' || !clockConfig}
+              loading={Boolean(submitting)}
+              onClick={openClockModal}
             >
-              上班打卡
+              {clockAction === 'COMPLETED' ? '今日已完成' : '考勤打卡'}
             </Button>
-            <Button
-              size="large"
-              icon={<LogoutOutlined />}
-              disabled={!today?.clockInTime || Boolean(today.clockOutTime)}
-              loading={submitting === 'out'}
-              onClick={() => void handleClockOut()}
-            >
-              下班打卡
-            </Button>
-          </Space>
+            <Typography.Text type="secondary">
+              {clockAction === 'COMPLETED' ? '无需重复操作' : '需验证当前位置'}
+            </Typography.Text>
+          </div>
         )}
       </section>
 
@@ -464,6 +637,75 @@ export const AttendancePage = memo(function AttendancePage() {
           scroll={{ x: 940 }}
         />
       </Card>
+
+      <Modal
+        title={`定位${clockActionLabel}`}
+        open={clockModalOpen}
+        onCancel={closeClockModal}
+        width={560}
+        destroyOnHidden
+        footer={[
+          <Button
+            key="relocate"
+            icon={<ReloadOutlined />}
+            disabled={locationState.status === 'locating' || Boolean(submitting)}
+            onClick={locateForClock}
+          >
+            重新定位
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            icon={<EnvironmentOutlined />}
+            disabled={locationState.status !== 'inside' || !locationState.point}
+            loading={Boolean(submitting)}
+            onClick={() => void handleClockSubmit()}
+          >
+            确认{clockActionLabel}
+          </Button>,
+        ]}
+      >
+        <div className={`attendance-location-state is-${locationState.status}`}>
+          <div className="attendance-location-icon">
+            <EnvironmentOutlined />
+          </div>
+          <Typography.Title level={4}>
+            {LOCATION_TITLES[locationState.status]}
+          </Typography.Title>
+          <Typography.Paragraph>{locationDescription}</Typography.Paragraph>
+        </div>
+
+        <div className="attendance-location-metrics">
+          <div>
+            <Typography.Text type="secondary">允许范围</Typography.Text>
+            <strong>{clockConfig ? `${clockConfig.radiusMeters} m` : '—'}</strong>
+          </div>
+          <div>
+            <Typography.Text type="secondary">定位精度</Typography.Text>
+            <strong>
+              {locationState.accuracyMeters === null
+                ? '—'
+                : `±${Math.round(locationState.accuracyMeters)} m`}
+            </strong>
+          </div>
+          <div>
+            <Typography.Text type="secondary">当前距离</Typography.Text>
+            <strong>
+              {locationState.distanceMeters === null
+                ? '—'
+                : `${Math.round(locationState.distanceMeters)} m`}
+            </strong>
+          </div>
+        </div>
+
+        <Alert
+          className="attendance-location-alert"
+          type={locationState.status === 'inside' ? 'success' : 'info'}
+          showIcon
+          message="位置由浏览器获取，服务端将在提交时再次校验"
+          description="定位功能需要在 HTTPS 或 localhost 环境运行。"
+        />
+      </Modal>
 
       <Modal
         title="申请补签"

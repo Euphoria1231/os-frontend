@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { attendanceService } from '../../services/attendance/attendance.service.ts'
-import type { AttendanceRecord } from '../../services/attendance/attendance.types.ts'
+import type {
+  AttendanceClockConfig,
+  AttendanceRecord,
+  ClockLocation,
+} from '../../services/attendance/attendance.types.ts'
 import { RequestError } from '../../services/request.ts'
 
 const TODAY_RECORD_NOT_FOUND = 40401
@@ -19,6 +23,7 @@ async function getTodayOrNull(): Promise<AttendanceRecord | null> {
 export function useAttendance(startDate: string, endDate: string) {
   const [today, setToday] = useState<AttendanceRecord | null>(null)
   const [records, setRecords] = useState<AttendanceRecord[]>([])
+  const [clockConfig, setClockConfig] = useState<AttendanceClockConfig | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<unknown>(null)
 
@@ -28,11 +33,13 @@ export function useAttendance(startDate: string, endDate: string) {
     Promise.all([
       getTodayOrNull(),
       attendanceService.listRecords({ startDate, endDate }),
+      attendanceService.getClockConfig(),
     ])
-      .then(([todayRecord, recordList]) => {
+      .then(([todayRecord, recordList, config]) => {
         if (active) {
           setToday(todayRecord)
           setRecords(recordList)
+          setClockConfig(config)
           setError(null)
         }
       })
@@ -56,12 +63,14 @@ export function useAttendance(startDate: string, endDate: string) {
     setLoading(true)
     setError(null)
     try {
-      const [todayRecord, recordList] = await Promise.all([
+      const [todayRecord, recordList, config] = await Promise.all([
         getTodayOrNull(),
         attendanceService.listRecords({ startDate, endDate }),
+        attendanceService.getClockConfig(),
       ])
       setToday(todayRecord)
       setRecords(recordList)
+      setClockConfig(config)
     } catch (requestError) {
       setError(requestError)
     } finally {
@@ -77,19 +86,34 @@ export function useAttendance(startDate: string, endDate: string) {
     }
   }, [endDate, startDate])
 
-  const clockIn = useCallback(async () => {
-    const result = await attendanceService.clockIn()
-    setToday(result)
-    await refreshRecords()
-    return result
-  }, [refreshRecords])
+  const clockIn = useCallback(
+    async (location: ClockLocation) => {
+      const result = await attendanceService.clockIn(location)
+      setToday(result)
+      await refreshRecords()
+      return result
+    },
+    [refreshRecords],
+  )
 
-  const clockOut = useCallback(async () => {
-    const result = await attendanceService.clockOut()
-    setToday(result)
-    await refreshRecords()
-    return result
-  }, [refreshRecords])
+  const clockOut = useCallback(
+    async (location: ClockLocation) => {
+      const result = await attendanceService.clockOut(location)
+      setToday(result)
+      await refreshRecords()
+      return result
+    },
+    [refreshRecords],
+  )
 
-  return { today, records, loading, error, reload, clockIn, clockOut }
+  return {
+    today,
+    records,
+    clockConfig,
+    loading,
+    error,
+    reload,
+    clockIn,
+    clockOut,
+  }
 }

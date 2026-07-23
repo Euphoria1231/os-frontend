@@ -18,6 +18,21 @@ export interface AttendanceRecordQuery {
   endDate: string
 }
 
+export interface ClockLocation {
+  longitude: number
+  latitude: number
+}
+
+export interface AttendanceClockConfig {
+  morningStartTime: string
+  morningEndTime: string
+  afternoonStartTime: string
+  afternoonEndTime: string
+  centerLongitude: number
+  centerLatitude: number
+  radiusMeters: number
+}
+
 export interface MakeupQuota {
   employeeId: number
   quotaMonth: string
