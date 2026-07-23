@@ -12,6 +12,7 @@ import { PositionPage } from './views/organization/PositionPage.tsx'
 import { NoticePage } from './views/notice/NoticePage.tsx'
 import { PermissionPage } from './views/permission/PermissionPage.tsx'
 import { WorkbenchPage } from './views/workbench/WorkbenchPage.tsx'
+import { IntelligencePage } from './views/intelligence/IntelligencePage.tsx'
 
 function App() {
   return (
@@ -89,6 +90,14 @@ function App() {
             element={
               <PermissionGate authority="GET:/api/notices/**" showDenied>
                 <NoticePage />
+              </PermissionGate>
+            }
+          />
+          <Route
+            path="ai/assistant"
+            element={
+              <PermissionGate authority="POST:/api/intelligence/ai/**" showDenied>
+                <IntelligencePage />
               </PermissionGate>
             }
           />

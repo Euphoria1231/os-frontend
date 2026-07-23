@@ -9,6 +9,7 @@ import {
   SafetyCertificateOutlined,
   SolutionOutlined,
   TeamOutlined,
+  RobotOutlined,
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 
@@ -87,6 +88,12 @@ export const navigationNodes: NavigationNode[] = [
     label: '公告通知',
     icon: <BellOutlined />,
     authority: 'GET:/api/notices/**',
+  },
+  {
+    key: '/ai/assistant',
+    label: '智能办公',
+    icon: <RobotOutlined />,
+    authority: 'POST:/api/intelligence/ai/**',
   },
 ]
 
