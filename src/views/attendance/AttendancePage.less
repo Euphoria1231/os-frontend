@@ -1,0 +1,248 @@
+@import '../../styles/tokens.less';
+
+.attendance-page {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+}
+
+.attendance-clock-card {
+  position: relative;
+  display: grid;
+  min-height: 250px;
+  padding: 36px 40px;
+  border-radius: 22px;
+  align-items: center;
+  gap: 34px;
+  grid-template-columns: minmax(260px, 1fr) auto auto;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 0, fade(@color-accent, 17%), transparent 34%),
+    linear-gradient(135deg, @color-navy-950, @color-navy-800);
+  box-shadow: 0 20px 52px fade(@color-navy-900, 15%);
+
+  &::after {
+    position: absolute;
+    right: -120px;
+    bottom: -260px;
+    width: 430px;
+    height: 430px;
+    border: 1px solid fade(@color-white, 9%);
+    border-radius: 50%;
+    content: '';
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.attendance-clock-copy {
+  .ant-tag {
+    margin: 0 0 12px;
+    padding: 4px 10px;
+    background: fade(@color-accent, 14%);
+    color: @color-accent-200;
+    font-family: @font-display;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+  }
+
+  h1.ant-typography {
+    margin: 0 0 6px;
+    color: @color-white;
+    font-family: @font-display;
+    font-size: clamp(38px, 5vw, 58px);
+    letter-spacing: -0.035em;
+  }
+
+  p.ant-typography {
+    margin: 0;
+    color: fade(@color-white, 58%);
+    font-size: 13px;
+  }
+}
+
+.attendance-today-status {
+  display: flex;
+  padding: 20px;
+  border: 1px solid fade(@color-white, 11%);
+  border-radius: 16px;
+  align-items: center;
+  gap: 20px;
+  background: fade(@color-white, 6%);
+
+  > div {
+    min-width: 94px;
+
+    > span:first-child {
+      display: grid;
+      width: 30px;
+      height: 30px;
+      margin-bottom: 10px;
+      border-radius: 9px;
+      background: fade(@color-accent, 16%);
+      color: @color-accent-200;
+      place-items: center;
+    }
+
+    > .ant-typography {
+      color: fade(@color-white, 46%);
+      font-size: 10px;
+    }
+
+    h4.ant-typography {
+      margin: 3px 0 0;
+      color: @color-white;
+      font-family: @font-display;
+      font-size: 18px;
+    }
+  }
+
+  > i {
+    width: 1px;
+    height: 62px;
+    background: fade(@color-white, 10%);
+  }
+}
+
+.attendance-clock-actions {
+  flex-direction: column;
+
+  .ant-btn {
+    width: 132px;
+  }
+
+  .ant-btn:not(.ant-btn-primary) {
+    border-color: fade(@color-white, 22%);
+    background: fade(@color-white, 6%);
+    color: @color-white;
+  }
+}
+
+.attendance-stats {
+  margin: 18px 0;
+
+  .ant-card {
+    height: 100%;
+    border: 1px solid @color-slate-200;
+    border-radius: 16px;
+  }
+
+  .ant-card-body {
+    padding: 19px 22px;
+  }
+
+  .ant-statistic-title {
+    color: @color-slate-500;
+    font-size: 11px;
+  }
+
+  .ant-statistic-content {
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 25px;
+  }
+
+  .ant-statistic-content-prefix {
+    margin-right: 9px;
+    color: @color-accent-700;
+    font-size: 17px;
+  }
+
+  .ant-statistic-content-suffix {
+    color: @color-slate-500;
+    font-family: @font-body;
+    font-size: 11px;
+  }
+}
+
+.attendance-alert {
+  margin-bottom: 18px;
+  border-radius: 12px;
+}
+
+.attendance-record-card.ant-card {
+  border: 1px solid @color-slate-200;
+  border-radius: 18px;
+  box-shadow: 0 12px 34px fade(@color-navy-900, 5%);
+
+  > .ant-card-body {
+    padding: 0;
+  }
+
+  .ant-table-wrapper {
+    padding: 0 22px 22px;
+  }
+
+  .ant-table-thead > tr > th {
+    background: @color-slate-50;
+    color: @color-slate-500;
+    font-size: 11px;
+  }
+}
+
+.attendance-record-toolbar {
+  display: flex;
+  padding: 22px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  h4.ant-typography {
+    margin: 0 0 3px;
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 17px;
+  }
+
+  .ant-typography-secondary {
+    font-size: 11px;
+  }
+}
+
+.attendance-date-cell {
+  display: flex;
+  flex-direction: column;
+
+  .ant-typography-secondary {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .attendance-clock-card {
+    grid-template-columns: 1fr auto;
+  }
+
+  .attendance-clock-actions {
+    align-items: stretch;
+    flex-direction: row;
+    grid-column: 1 / -1;
+
+    .ant-btn {
+      width: auto;
+      flex: 1;
+    }
+  }
+}
+
+@media (max-width: 720px) {
+  .attendance-clock-card {
+    padding: 30px 24px;
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-today-status {
+    justify-content: space-between;
+  }
+
+  .attendance-record-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .attendance-record-card.ant-card .ant-table-wrapper {
+    padding: 0 14px 18px;
+  }
+}

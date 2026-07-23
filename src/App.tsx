@@ -3,6 +3,7 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx'
 import { AppLayout } from './components/layout/AppLayout.tsx'
 import { PermissionGate } from './components/permission/PermissionGate.tsx'
 import { LoginPage } from './views/auth/LoginPage.tsx'
+import { AttendancePage } from './views/attendance/AttendancePage.tsx'
 import { EmployeePage } from './views/employee/EmployeePage.tsx'
 import { DepartmentPage } from './views/organization/DepartmentPage.tsx'
 import { PositionPage } from './views/organization/PositionPage.tsx'
@@ -11,12 +12,6 @@ import { ModulePlaceholder } from './views/shared/ModulePlaceholder.tsx'
 import { WorkbenchPage } from './views/workbench/WorkbenchPage.tsx'
 
 const moduleRoutes = [
-  {
-    path: 'attendance',
-    authority: 'GET:/api/attendance/**',
-    title: '考勤打卡',
-    description: '完成上下班打卡并查询个人出勤记录。',
-  },
   {
     path: 'flow/applications',
     authority: 'GET:/api/flow/applications/**',
@@ -81,6 +76,14 @@ function App() {
             element={
               <PermissionGate authority="GET:/api/user/**" showDenied>
                 <PermissionPage />
+              </PermissionGate>
+            }
+          />
+          <Route
+            path="attendance"
+            element={
+              <PermissionGate authority="GET:/api/attendance/**" showDenied>
+                <AttendancePage />
               </PermissionGate>
             }
           />
