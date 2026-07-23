@@ -63,6 +63,15 @@ describe('Login page', () => {
     cleanup()
   })
 
+  it('presents the enterprise workspace sign-in context', () => {
+    const authService = createAuthService()
+
+    renderLogin(authService)
+
+    expect(screen.getByRole('heading', { name: '企业协同办公平台' })).toBeInTheDocument()
+    expect(screen.getByText('统一身份认证')).toBeInTheDocument()
+  })
+
   it('submits credentials and redirects after login succeeds', async () => {
     const authService = createAuthService()
 
