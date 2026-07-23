@@ -21,9 +21,8 @@ export const PermissionPage = memo(function PermissionPage() {
   return (
     <section className="permission-page">
       <PageHeader
-        eyebrow="SECURITY / RBAC"
         title="权限管理"
-        description="以角色为核心配置菜单可见性和接口访问边界，前后端权限标识保持统一。"
+        description=""
         extra={
           <Button icon={<ReloadOutlined />} loading={loading} onClick={() => void reload()}>
             刷新权限数据
@@ -49,7 +48,7 @@ export const PermissionPage = memo(function PermissionPage() {
         </Col>
       </Row>
 
-      {error && (
+      {Boolean(error) && (
         <Alert
           className="permission-alert"
           type="warning"

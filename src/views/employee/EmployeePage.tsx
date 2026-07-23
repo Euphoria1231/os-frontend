@@ -2,6 +2,7 @@ import { memo, useMemo, useState } from 'react'
 import {
   DeleteOutlined,
   EditOutlined,
+  FormOutlined,
   PlusOutlined,
   ReloadOutlined,
   SafetyCertificateOutlined,
@@ -16,8 +17,10 @@ import {
   Button,
   Card,
   Col,
+  DatePicker,
   Form,
   Input,
+  InputNumber,
   Modal,
   Popconfirm,
   Row,
@@ -29,12 +32,14 @@ import {
   Typography,
   type TableProps,
 } from 'antd'
+import dayjs, { type Dayjs } from 'dayjs'
 import { PageHeader } from '../../components/common/PageHeader.tsx'
 import { StatusTag } from '../../components/common/StatusTag.tsx'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
 import { useEmployees } from '../../hooks/employee/useEmployees.ts'
 import { useDepartments } from '../../hooks/organization/useDepartments.ts'
 import { usePositions } from '../../hooks/organization/usePositions.ts'
+import { attendanceService } from '../../services/attendance/attendance.service.ts'
 import type {
   Employee,
   EmployeeCreateRequest,
@@ -62,8 +67,14 @@ function getInitials(name: string): string {
   return name.trim().slice(-2)
 }
 
+interface MakeupQuotaFormValues {
+  quotaMonth: Dayjs
+  totalCount: number
+}
+
 export const EmployeePage = memo(function EmployeePage() {
   const [form] = Form.useForm<EmployeeFormValues>()
+  const [makeupQuotaForm] = Form.useForm<MakeupQuotaFormValues>()
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -75,8 +86,11 @@ export const EmployeePage = memo(function EmployeePage() {
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([])
   const [rolesLoading, setRolesLoading] = useState(false)
   const [rolesSubmitting, setRolesSubmitting] = useState(false)
+  const [makeupQuotaTarget, setMakeupQuotaTarget] = useState<Employee | null>(null)
+  const [makeupQuotaModalOpen, setMakeupQuotaModalOpen] = useState(false)
+  const [makeupQuotaSubmitting, setMakeupQuotaSubmitting] = useState(false)
   const { message } = App.useApp()
-  const { hasAuthority } = useAuth()
+  const { user, isSuperAdmin, hasAuthority } = useAuth()
   const {
     employees,
     loading,
@@ -85,13 +99,15 @@ export const EmployeePage = memo(function EmployeePage() {
     createEmployee,
     updateEmployee,
     deleteEmployee,
-  } = useEmployees()
-  const { departments } = useDepartments()
-  const { positions } = usePositions()
+  } = useEmployees(isSuperAdmin ? 'all' : 'direct-reports')
+  const canManageEmployees = isSuperAdmin || hasAuthority('PUT:/api/user/**')
+  const { departments } = useDepartments(canManageEmployees)
+  const { positions } = usePositions(canManageEmployees)
 
   const canCreate = hasAuthority('POST:/api/user/**')
   const canUpdate = hasAuthority('PUT:/api/user/**')
   const canDelete = hasAuthority('DELETE:/api/user/**')
+  const canAssignMakeupQuota = hasAuthority('PUT:/api/attendance/makeup-quotas/**')
   const filteredEmployees = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase()
     return employees.filter((employee) => {
@@ -240,6 +256,43 @@ export const EmployeePage = memo(function EmployeePage() {
     }
   }
 
+  const openMakeupQuotaModal = (employee: Employee) => {
+    setMakeupQuotaTarget(employee)
+    makeupQuotaForm.setFieldsValue({
+      quotaMonth: dayjs().startOf('month'),
+      totalCount: 5,
+    })
+    setMakeupQuotaModalOpen(true)
+  }
+
+  const closeMakeupQuotaModal = () => {
+    setMakeupQuotaModalOpen(false)
+    setMakeupQuotaTarget(null)
+    makeupQuotaForm.resetFields()
+  }
+
+  const handleAssignMakeupQuota = async (values: MakeupQuotaFormValues) => {
+    if (!makeupQuotaTarget) {
+      return
+    }
+
+    setMakeupQuotaSubmitting(true)
+    try {
+      const quota = await attendanceService.assignMakeupQuota(makeupQuotaTarget.id, {
+        quotaMonth: values.quotaMonth.format('YYYY-MM'),
+        totalCount: values.totalCount,
+      })
+      message.success(
+        `已为“${makeupQuotaTarget.realName}”配置 ${quota.quotaMonth} 补签额度 ${quota.totalCount} 次`,
+      )
+      closeMakeupQuotaModal()
+    } catch (requestError) {
+      message.error(getErrorMessage(requestError, '补签额度配置失败'))
+    } finally {
+      setMakeupQuotaSubmitting(false)
+    }
+  }
+
   const columns: TableProps<Employee>['columns'] = [
     {
       title: '员工',
@@ -314,49 +367,67 @@ export const EmployeePage = memo(function EmployeePage() {
     },
   ]
 
-  if (canUpdate || canDelete) {
+  if (canUpdate || canDelete || canAssignMakeupQuota) {
     columns.push({
       title: '操作',
       key: 'actions',
       fixed: 'right',
-      width: 210,
-      render: (_, employee) => (
-        <Space size={2}>
-          {canUpdate && (
-            <Button
-              type="text"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={() => openEditModal(employee)}
-            >
-              编辑
-            </Button>
-          )}
-          {canUpdate && (
-            <Button
-              type="text"
-              size="small"
-              icon={<SafetyCertificateOutlined />}
-              onClick={() => void openRoleModal(employee)}
-            >
-              角色
-            </Button>
-          )}
-          {canDelete && (
-            <Popconfirm
-              title="删除该员工？"
-              description="删除后该账号将无法登录，请谨慎操作。"
-              okText="确认删除"
-              cancelText="取消"
-              onConfirm={() => handleDelete(employee)}
-            >
-              <Button type="text" size="small" danger icon={<DeleteOutlined />}>
-                删除
+      width: 310,
+      render: (_, employee) => {
+        const canAssignThisEmployee = canAssignMakeupQuota
+          && employee.leaderId === user?.id
+          && employee.status === 1
+        return (
+          <Space size={2}>
+            {canAssignThisEmployee && (
+              <Button
+                type="text"
+                size="small"
+                icon={<FormOutlined />}
+                onClick={() => openMakeupQuotaModal(employee)}
+              >
+                补签额度
               </Button>
-            </Popconfirm>
-          )}
-        </Space>
-      ),
+            )}
+            {canUpdate && (
+              <Button
+                type="text"
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => openEditModal(employee)}
+              >
+                编辑
+              </Button>
+            )}
+            {canUpdate && (
+              <Button
+                type="text"
+                size="small"
+                icon={<SafetyCertificateOutlined />}
+                onClick={() => void openRoleModal(employee)}
+              >
+                角色
+              </Button>
+            )}
+            {canDelete && (
+              <Popconfirm
+                title="删除该员工？"
+                description="删除后该账号将无法登录，请谨慎操作。"
+                okText="确认删除"
+                cancelText="取消"
+                onConfirm={() => handleDelete(employee)}
+              >
+                <Button type="text" size="small" danger icon={<DeleteOutlined />}>
+                  删除
+                </Button>
+              </Popconfirm>
+            )}
+            {!canAssignThisEmployee && !canUpdate && !canDelete && (
+              <Typography.Text type="secondary">非直属员工</Typography.Text>
+            )}
+          </Space>
+        )
+      },
     })
   }
 
@@ -366,9 +437,9 @@ export const EmployeePage = memo(function EmployeePage() {
   return (
     <section className="employee-page">
       <PageHeader
-        eyebrow="ORGANIZATION / EMPLOYEES"
+        eyebrow=""
         title="员工管理"
-        description="集中管理员工账号、组织任职、直属领导与角色，保持人员主数据清晰一致。"
+        description=""
         extra={
           canCreate ? (
             <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
@@ -396,7 +467,7 @@ export const EmployeePage = memo(function EmployeePage() {
         </Col>
       </Row>
 
-      {error && (
+      {Boolean(error) && (
         <Alert
           className="employee-alert"
           type="warning"
@@ -445,7 +516,7 @@ export const EmployeePage = memo(function EmployeePage() {
           dataSource={filteredEmployees}
           loading={loading}
           pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (total) => `共 ${total} 名员工` }}
-          scroll={{ x: 1320 }}
+          scroll={{ x: 1420 }}
         />
       </Card>
 
@@ -609,6 +680,49 @@ export const EmployeePage = memo(function EmployeePage() {
             style={{ width: '100%' }}
           />
         </div>
+      </Modal>
+
+      <Modal
+        title={`配置补签额度${makeupQuotaTarget ? ` · ${makeupQuotaTarget.realName}` : ''}`}
+        open={makeupQuotaModalOpen}
+        onCancel={closeMakeupQuotaModal}
+        footer={null}
+        width={560}
+      >
+        <Alert
+          className="employee-quota-alert"
+          type="info"
+          showIcon
+          message="额度按月配置"
+          description="仅直属领导可以为该员工配置额度；重复配置同一月份会更新总次数，默认填写 5 次。"
+        />
+        <Form<MakeupQuotaFormValues>
+          form={makeupQuotaForm}
+          layout="vertical"
+          onFinish={handleAssignMakeupQuota}
+          requiredMark="optional"
+        >
+          <Form.Item
+            label="额度月份"
+            name="quotaMonth"
+            rules={[{ required: true, message: '请选择额度月份' }]}
+          >
+            <DatePicker picker="month" format="YYYY-MM" allowClear={false} style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item
+            label="补签总次数"
+            name="totalCount"
+            rules={[{ required: true, message: '请输入补签总次数' }]}
+          >
+            <InputNumber min={1} precision={0} style={{ width: '100%' }} />
+          </Form.Item>
+          <div className="employee-form-actions">
+            <Button onClick={closeMakeupQuotaModal}>取消</Button>
+            <Button type="primary" htmlType="submit" loading={makeupQuotaSubmitting}>
+              保存额度
+            </Button>
+          </div>
+        </Form>
       </Modal>
     </section>
   )

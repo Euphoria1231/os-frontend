@@ -218,10 +218,26 @@
   flex-direction: column;
 }
 
-.app-content.ant-layout-content {
+.app-content-frame {
+  display: flex;
   min-width: 0;
   padding: 28px;
+  align-items: flex-start;
+  gap: 18px;
   background: @color-slate-50;
+}
+
+.app-content.ant-layout-content {
+  min-width: 0;
+  padding: 0;
+  flex: 1;
+  background: transparent;
+}
+
+@media (max-width: 1100px) {
+  .app-content-frame {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 768px) {
@@ -238,7 +254,7 @@
     display: none;
   }
 
-  .app-content.ant-layout-content {
+  .app-content-frame {
     padding: 18px;
   }
 }

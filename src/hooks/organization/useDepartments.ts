@@ -5,13 +5,21 @@ import type {
   DepartmentRequest,
 } from '../../services/organization/organization.types.ts'
 
-export function useDepartments() {
+export function useDepartments(enabled = true) {
   const [departments, setDepartments] = useState<Department[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<unknown>(null)
 
   useEffect(() => {
+    if (!enabled) {
+      setDepartments([])
+      setLoading(false)
+      setError(null)
+      return
+    }
+
     let active = true
+    setLoading(true)
 
     organizationService
       .listDepartments()
@@ -35,9 +43,12 @@ export function useDepartments() {
     return () => {
       active = false
     }
-  }, [])
+  }, [enabled])
 
   const reload = useCallback(async () => {
+    if (!enabled) {
+      return
+    }
     setLoading(true)
     setError(null)
     try {
@@ -47,7 +58,7 @@ export function useDepartments() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [enabled])
 
   const createDepartment = useCallback(
     async (values: DepartmentRequest) => {

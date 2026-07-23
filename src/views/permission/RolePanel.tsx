@@ -216,7 +216,6 @@ export const RolePanel = memo(function RolePanel({ controller }: PermissionPanel
       <div className="permission-panel-toolbar">
         <div>
           <Typography.Title level={4}>角色目录</Typography.Title>
-          <Typography.Text type="secondary">角色连接员工身份与菜单、接口权限</Typography.Text>
         </div>
         {canCreate && (
           <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>

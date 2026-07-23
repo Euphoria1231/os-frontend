@@ -47,7 +47,7 @@ export const navigationNodes: NavigationNode[] = [
         key: '/employees',
         label: '员工管理',
         icon: <TeamOutlined />,
-        authority: 'GET:/api/user/**',
+        authority: 'GET:/api/user/employees/direct-reports',
       },
       {
         key: '/permissions',

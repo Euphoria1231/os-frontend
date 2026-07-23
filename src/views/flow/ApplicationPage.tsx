@@ -37,8 +37,10 @@ import { formatDateTime } from '../../utils/date.ts'
 import { getErrorMessage } from '../../utils/error.ts'
 import './FlowPage.less'
 
+type StandardApplicationType = Exclude<ApplicationType, 'MAKEUP'>
+
 interface ApplicationFormValues {
-  applicationType: ApplicationType
+  applicationType: StandardApplicationType
   timeRange: [Dayjs, Dayjs]
   reason: string
 }
@@ -55,7 +57,8 @@ function getDefaultValues(): ApplicationFormValues {
   }
 }
 
-function formatDuration(startTime: string, endTime: string): string {
+function formatDuration(startTime: string | null, endTime: string | null): string {
+  if (!startTime || !endTime) return '—'
   const minutes = dayjs(endTime).diff(dayjs(startTime), 'minute')
   if (minutes < 60) return `${minutes} 分钟`
   const hours = Math.floor(minutes / 60)
@@ -112,15 +115,21 @@ export const ApplicationPage = memo(function ApplicationPage() {
       ),
     },
     {
-      title: '申请时间',
+      title: '申请内容',
       key: 'timeRange',
       width: 250,
-      render: (_, application) => (
-        <div className="flow-time-cell">
-          <Typography.Text>{formatDateTime(application.startTime)}</Typography.Text>
-          <Typography.Text type="secondary">至 {formatDateTime(application.endTime)}</Typography.Text>
-        </div>
-      ),
+      render: (_, application) =>
+        application.applicationType === 'MAKEUP' ? (
+          <div className="flow-time-cell">
+            <Typography.Text>考勤记录 #{application.attendanceRecordId ?? '—'}</Typography.Text>
+            <Typography.Text type="secondary">迟到补签</Typography.Text>
+          </div>
+        ) : (
+          <div className="flow-time-cell">
+            <Typography.Text>{formatDateTime(application.startTime)}</Typography.Text>
+            <Typography.Text type="secondary">至 {formatDateTime(application.endTime)}</Typography.Text>
+          </div>
+        ),
     },
     {
       title: '时长',
@@ -164,9 +173,8 @@ export const ApplicationPage = memo(function ApplicationPage() {
   return (
     <section className="flow-page">
       <PageHeader
-        eyebrow="WORKFLOW / APPLICATIONS"
         title="我的申请"
-        description="提交请假或加班申请，并持续跟踪直属领导的一级审批结果。"
+        description=""
         extra={
           canSubmit ? (
             <Button type="primary" icon={<PlusOutlined />} onClick={openModal}>
@@ -188,7 +196,7 @@ export const ApplicationPage = memo(function ApplicationPage() {
         </Col>
       </Row>
 
-      {error && (
+      {Boolean(error) && (
         <Alert
           className="flow-alert"
           type="warning"
@@ -203,7 +211,6 @@ export const ApplicationPage = memo(function ApplicationPage() {
         <div className="flow-table-toolbar">
           <div>
             <Typography.Title level={4}>申请记录</Typography.Title>
-            <Typography.Text type="secondary">按最近提交顺序查看个人单据</Typography.Text>
           </div>
           <Button type="text" icon={<ReloadOutlined />} loading={loading} onClick={() => void reload()}>
             刷新

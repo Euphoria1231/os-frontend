@@ -21,7 +21,6 @@ import {
   Space,
   Statistic,
   Table,
-  Tag,
   Typography,
   type TableProps,
 } from 'antd'
@@ -127,14 +126,13 @@ export const PositionPage = memo(function PositionPage() {
       title: '岗位信息',
       dataIndex: 'name',
       key: 'name',
-      render: (name: string, position) => (
+      render: (name: string) => (
         <Space size={10}>
           <span className="organization-row-icon position-tone">
             <IdcardOutlined />
           </span>
           <div className="organization-primary-cell">
             <Typography.Text strong>{name}</Typography.Text>
-            <Tag bordered={false}>{position.code}</Tag>
           </div>
         </Space>
       ),
@@ -205,9 +203,9 @@ export const PositionPage = memo(function PositionPage() {
   return (
     <section className="organization-page">
       <PageHeader
-        eyebrow="ORGANIZATION / POSITIONS"
+        eyebrow=""
         title="岗位管理"
-        description="统一维护岗位编码、岗位说明与启停状态，为员工任职和权限分配提供标准依据。"
+        description=""
         extra={
           canCreate ? (
             <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
@@ -235,7 +233,7 @@ export const PositionPage = memo(function PositionPage() {
         </Col>
       </Row>
 
-      {error && (
+      {Boolean(error) && (
         <Alert
           className="organization-alert"
           type="warning"
@@ -254,7 +252,6 @@ export const PositionPage = memo(function PositionPage() {
         <div className="organization-table-heading">
           <div>
             <Typography.Title level={4}>岗位目录</Typography.Title>
-            <Typography.Text type="secondary">岗位编码提交时统一转换为大写</Typography.Text>
           </div>
           <Button
             type="text"

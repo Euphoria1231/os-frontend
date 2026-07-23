@@ -105,9 +105,8 @@ export const NoticePage = memo(function NoticePage() {
   return (
     <section className="notice-page">
       <PageHeader
-        eyebrow="COMMUNICATION / NOTICES"
         title="公告通知"
-        description="及时查看公司公告和个人阅读状态，让重要信息清晰触达每一位员工。"
+        description=""
         extra={
           canPublish ? (
             <Button type="primary" icon={<PlusOutlined />} onClick={openPublishModal}>
@@ -129,7 +128,7 @@ export const NoticePage = memo(function NoticePage() {
         </Col>
       </Row>
 
-      {error && (
+      {Boolean(error) && (
         <Alert
           className="notice-alert"
           type="warning"

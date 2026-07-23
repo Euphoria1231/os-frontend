@@ -101,15 +101,21 @@ export const ApprovalPage = memo(function ApprovalPage() {
       render: (applicantId: number) => `员工 ${applicantId}`,
     },
     {
-      title: '申请时间',
+      title: '申请内容',
       key: 'timeRange',
       width: 250,
-      render: (_, application) => (
-        <div className="flow-time-cell">
-          <Typography.Text>{formatDateTime(application.startTime)}</Typography.Text>
-          <Typography.Text type="secondary">至 {formatDateTime(application.endTime)}</Typography.Text>
-        </div>
-      ),
+      render: (_, application) =>
+        application.applicationType === 'MAKEUP' ? (
+          <div className="flow-time-cell">
+            <Typography.Text>考勤记录 #{application.attendanceRecordId ?? '—'}</Typography.Text>
+            <Typography.Text type="secondary">迟到补签</Typography.Text>
+          </div>
+        ) : (
+          <div className="flow-time-cell">
+            <Typography.Text>{formatDateTime(application.startTime)}</Typography.Text>
+            <Typography.Text type="secondary">至 {formatDateTime(application.endTime)}</Typography.Text>
+          </div>
+        ),
     },
     {
       title: '申请原因',
@@ -207,7 +213,7 @@ export const ApprovalPage = memo(function ApprovalPage() {
       <PageHeader
         eyebrow="WORKFLOW / APPROVALS"
         title="审批中心"
-        description="处理直属员工提交的请假与加班申请，并查看个人已办审批记录。"
+        description="处理直属员工提交的请假、加班与补签申请，并查看个人已办审批记录。"
         extra={<Button icon={<ReloadOutlined />} loading={loading} onClick={() => void reload()}>刷新任务</Button>}
       />
 
@@ -223,7 +229,7 @@ export const ApprovalPage = memo(function ApprovalPage() {
         </Col>
       </Row>
 
-      {error && (
+      {Boolean(error) && (
         <Alert
           className="flow-alert"
           type="warning"

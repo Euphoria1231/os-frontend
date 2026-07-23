@@ -6,7 +6,9 @@ import type {
   EmployeeUpdateRequest,
 } from '../../services/employee/employee.types.ts'
 
-export function useEmployees() {
+export type EmployeeListScope = 'all' | 'direct-reports'
+
+export function useEmployees(scope: EmployeeListScope = 'all') {
   const [employees, setEmployees] = useState<Employee[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<unknown>(null)
@@ -14,8 +16,11 @@ export function useEmployees() {
   useEffect(() => {
     let active = true
 
-    employeeService
-      .listEmployees()
+    const listEmployees = scope === 'direct-reports'
+      ? employeeService.listDirectReports
+      : employeeService.listEmployees
+
+    listEmployees()
       .then((result) => {
         if (active) {
           setEmployees(result)
@@ -36,19 +41,22 @@ export function useEmployees() {
     return () => {
       active = false
     }
-  }, [])
+  }, [scope])
 
   const reload = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      setEmployees(await employeeService.listEmployees())
+      const result = scope === 'direct-reports'
+        ? await employeeService.listDirectReports()
+        : await employeeService.listEmployees()
+      setEmployees(result)
     } catch (requestError) {
       setError(requestError)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [scope])
 
   const createEmployee = useCallback(
     async (values: EmployeeCreateRequest) => {

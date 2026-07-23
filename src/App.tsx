@@ -47,7 +47,7 @@ function App() {
           <Route
             path="employees"
             element={
-              <PermissionGate authority="GET:/api/user/**" showDenied>
+              <PermissionGate authority="GET:/api/user/employees/direct-reports" showDenied>
                 <EmployeePage />
               </PermissionGate>
             }

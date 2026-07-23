@@ -225,7 +225,6 @@ export const MenuPanel = memo(function MenuPanel({ controller }: PermissionPanel
       <div className="permission-panel-toolbar">
         <div>
           <Typography.Title level={4}>菜单权限目录</Typography.Title>
-          <Typography.Text type="secondary">维护目录、页面菜单和按钮级权限标识</Typography.Text>
         </div>
         {canCreate && (
           <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>

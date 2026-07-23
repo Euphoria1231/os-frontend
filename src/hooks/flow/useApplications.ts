@@ -4,6 +4,7 @@ import type {
   ApplicationRequest,
   ApplicationType,
   FlowApplication,
+  MakeupApplicationRequest,
 } from '../../services/flow/flow.types.ts'
 
 export function useApplications() {
@@ -51,7 +52,7 @@ export function useApplications() {
   }, [])
 
   const submitApplication = useCallback(
-    async (type: ApplicationType, values: ApplicationRequest) => {
+    async (type: Exclude<ApplicationType, 'MAKEUP'>, values: ApplicationRequest) => {
       const result =
         type === 'LEAVE'
           ? await flowService.submitLeave(values)
@@ -62,5 +63,14 @@ export function useApplications() {
     [reload],
   )
 
-  return { applications, loading, error, reload, submitApplication }
+  const submitMakeup = useCallback(
+    async (values: MakeupApplicationRequest) => {
+      const result = await flowService.submitMakeup(values)
+      await reload()
+      return result
+    },
+    [reload],
+  )
+
+  return { applications, loading, error, reload, submitApplication, submitMakeup }
 }

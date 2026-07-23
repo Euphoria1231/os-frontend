@@ -235,9 +235,9 @@ export const DepartmentPage = memo(function DepartmentPage() {
   return (
     <section className="organization-page">
       <PageHeader
-        eyebrow="ORGANIZATION / DEPARTMENTS"
+        eyebrow=""
         title="部门管理"
-        description="维护企业组织层级、负责人和启停状态，为员工归属与审批关系提供基础数据。"
+        description=""
         extra={
           canCreate ? (
             <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
@@ -265,7 +265,7 @@ export const DepartmentPage = memo(function DepartmentPage() {
         </Col>
       </Row>
 
-      {error && (
+      {Boolean(error) && (
         <Alert
           className="organization-alert"
           type="warning"
@@ -284,7 +284,6 @@ export const DepartmentPage = memo(function DepartmentPage() {
         <div className="organization-table-heading">
           <div>
             <Typography.Title level={4}>组织目录</Typography.Title>
-            <Typography.Text type="secondary">按后端显示顺序维护部门数据</Typography.Text>
           </div>
           <Button
             type="text"

@@ -6,13 +6,17 @@ import type {
   FlowApplication,
 } from '../../services/flow/flow.types.ts'
 
-export function useApprovalTasks() {
+export function useApprovalTasks(enabled = true) {
   const [todo, setTodo] = useState<FlowApplication[]>([])
   const [done, setDone] = useState<ApprovalTask[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<unknown>(null)
 
   useEffect(() => {
+    if (!enabled) {
+      return
+    }
+
     let active = true
 
     Promise.all([flowService.listTodo(), flowService.listDone()])
@@ -37,9 +41,13 @@ export function useApprovalTasks() {
     return () => {
       active = false
     }
-  }, [])
+  }, [enabled])
 
   const reload = useCallback(async () => {
+    if (!enabled) {
+      return
+    }
+
     setLoading(true)
     setError(null)
     try {
@@ -54,7 +62,7 @@ export function useApprovalTasks() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [enabled])
 
   const processApplication = useCallback(
     async (applicationId: number, action: 'approve' | 'reject', values: ApprovalRequest) => {
@@ -68,5 +76,12 @@ export function useApprovalTasks() {
     [reload],
   )
 
-  return { todo, done, loading, error, reload, processApplication }
+  return {
+    todo: enabled ? todo : [],
+    done: enabled ? done : [],
+    loading: enabled ? loading : false,
+    error: enabled ? error : null,
+    reload,
+    processApplication,
+  }
 }

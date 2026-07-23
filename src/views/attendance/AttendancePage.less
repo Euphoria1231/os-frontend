@@ -10,15 +10,16 @@
   display: grid;
   min-height: 250px;
   padding: 36px 40px;
+  border: 1px solid fade(@color-navy-900, 7%);
   border-radius: 22px;
   align-items: center;
   gap: 34px;
   grid-template-columns: minmax(260px, 1fr) auto auto;
   overflow: hidden;
   background:
-    radial-gradient(circle at 82% 0, fade(@color-accent, 17%), transparent 34%),
-    linear-gradient(135deg, @color-navy-950, @color-navy-800);
-  box-shadow: 0 20px 52px fade(@color-navy-900, 15%);
+    radial-gradient(circle at 82% 0, fade(@color-accent, 13%), transparent 34%),
+    linear-gradient(135deg, @color-white, @color-slate-50);
+  box-shadow: 0 16px 42px fade(@color-navy-900, 8%);
 
   &::after {
     position: absolute;
@@ -26,7 +27,7 @@
     bottom: -260px;
     width: 430px;
     height: 430px;
-    border: 1px solid fade(@color-white, 9%);
+    border: 1px solid fade(@color-navy-900, 7%);
     border-radius: 50%;
     content: '';
   }
@@ -41,8 +42,8 @@
   .ant-tag {
     margin: 0 0 12px;
     padding: 4px 10px;
-    background: fade(@color-accent, 14%);
-    color: @color-accent-200;
+    background: fade(@color-accent, 10%);
+    color: @color-accent-700;
     font-family: @font-display;
     font-size: 9px;
     letter-spacing: 0.12em;
@@ -50,7 +51,7 @@
 
   h1.ant-typography {
     margin: 0 0 6px;
-    color: @color-white;
+    color: @color-navy-900;
     font-family: @font-display;
     font-size: clamp(38px, 5vw, 58px);
     letter-spacing: -0.035em;
@@ -58,7 +59,7 @@
 
   p.ant-typography {
     margin: 0;
-    color: fade(@color-white, 58%);
+    color: @color-slate-800;
     font-size: 13px;
   }
 }
@@ -66,11 +67,11 @@
 .attendance-today-status {
   display: flex;
   padding: 20px;
-  border: 1px solid fade(@color-white, 11%);
+  border: 1px solid @color-slate-200;
   border-radius: 16px;
   align-items: center;
   gap: 20px;
-  background: fade(@color-white, 6%);
+  background: fade(@color-white, 76%);
 
   > div {
     min-width: 94px;
@@ -81,19 +82,19 @@
       height: 30px;
       margin-bottom: 10px;
       border-radius: 9px;
-      background: fade(@color-accent, 16%);
-      color: @color-accent-200;
+      background: fade(@color-accent, 12%);
+      color: @color-accent-700;
       place-items: center;
     }
 
     > .ant-typography {
-      color: fade(@color-white, 46%);
+      color: @color-slate-500;
       font-size: 10px;
     }
 
     h4.ant-typography {
       margin: 3px 0 0;
-      color: @color-white;
+      color: @color-navy-900;
       font-family: @font-display;
       font-size: 18px;
     }
@@ -102,7 +103,7 @@
   > i {
     width: 1px;
     height: 62px;
-    background: fade(@color-white, 10%);
+    background: @color-slate-200;
   }
 }
 
@@ -114,9 +115,9 @@
   }
 
   .ant-btn:not(.ant-btn-primary) {
-    border-color: fade(@color-white, 22%);
-    background: fade(@color-white, 6%);
-    color: @color-white;
+    border-color: @color-slate-200;
+    background: @color-white;
+    color: @color-navy-900;
   }
 }
 
@@ -154,6 +155,19 @@
     color: @color-slate-500;
     font-family: @font-body;
     font-size: 11px;
+  }
+}
+
+.attendance-quota-card {
+  .ant-card-body {
+    display: flex;
+    min-height: 104px;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .ant-typography-secondary {
+    font-size: 10px;
   }
 }
 
@@ -208,6 +222,25 @@
   .ant-typography-secondary {
     font-size: 10px;
   }
+}
+
+.attendance-makeup-summary {
+  padding: 14px 16px;
+  border: 1px solid @color-slate-200;
+  border-radius: 12px;
+  background: @color-slate-50;
+}
+
+.attendance-makeup-quota-alert {
+  margin: 14px 0 18px;
+  border-radius: 12px;
+}
+
+.attendance-makeup-actions {
+  display: flex;
+  padding-top: 4px;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 @media (max-width: 1100px) {

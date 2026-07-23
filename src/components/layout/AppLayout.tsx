@@ -22,6 +22,7 @@ import {
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
 import { buildNavigationItems, getNavigationTrail } from './navigation.tsx'
+import { WorkspaceUtilityRailContainer } from './WorkspaceUtilityRail.tsx'
 import './AppLayout.less'
 
 const { Content, Header, Sider } = Layout
@@ -123,16 +124,6 @@ export const AppLayout = memo(function AppLayout() {
           defaultOpenKeys={['organization-group', 'flow-group']}
           onClick={handleMenuClick}
         />
-
-        {!collapsed && (
-          <div className="app-sider-status">
-            <span />
-            <div>
-              <strong>Gateway 已配置</strong>
-              <small>统一接口入口 /api</small>
-            </div>
-          </div>
-        )}
       </Sider>
 
       <Layout>
@@ -179,9 +170,12 @@ export const AppLayout = memo(function AppLayout() {
           </Flex>
         </Header>
 
-        <Content className="app-content">
-          <Outlet />
-        </Content>
+        <div className="app-content-frame">
+          <Content className="app-content">
+            <Outlet />
+          </Content>
+          {location.pathname !== '/workspace' && <WorkspaceUtilityRailContainer />}
+        </div>
       </Layout>
     </Layout>
   )

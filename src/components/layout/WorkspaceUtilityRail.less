@@ -1,0 +1,307 @@
+@import '../../styles/tokens.less';
+
+.workspace-utility-rail {
+  position: sticky;
+  top: 96px;
+  width: 342px;
+  min-width: 342px;
+  flex: none;
+  transition:
+    width 220ms ease,
+    min-width 220ms ease;
+
+  &.is-collapsed {
+    width: 54px;
+    min-width: 54px;
+    height: calc(100vh - 124px);
+  }
+}
+
+.workspace-utility-card.ant-card {
+  border: 1px solid @color-slate-200;
+  border-radius: 18px;
+  background: @color-white;
+  box-shadow: 0 10px 28px fade(@color-navy-900, 4%);
+
+  > .ant-card-body {
+    padding: 20px;
+  }
+}
+
+.workspace-utility-heading {
+  display: flex;
+  margin-bottom: 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  h3.ant-typography {
+    margin: 0;
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 18px;
+  }
+
+  .ant-typography-secondary {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+  }
+
+  a {
+    font-size: 12px;
+  }
+}
+
+.workspace-utility-heading-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: fade(@color-accent, 11%);
+  color: @color-accent-700;
+  font-size: 17px;
+  place-items: center;
+
+  &.is-blue {
+    background: fade(#3278b7, 10%);
+    color: #2e6ea6;
+  }
+}
+
+.workspace-utility-collapsed {
+  display: flex;
+  height: 100%;
+  min-height: 420px;
+  padding: 8px;
+  border: 1px solid @color-slate-200;
+  border-radius: 16px;
+  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+  background: @color-white;
+  box-shadow: 0 10px 28px fade(@color-navy-900, 4%);
+  color: @color-slate-500;
+
+  > span {
+    width: 22px;
+    height: 1px;
+    background: @color-slate-200;
+  }
+
+  > .anticon {
+    font-size: 16px;
+  }
+}
+
+.workspace-notice-card .ant-alert {
+  margin-bottom: 10px;
+}
+
+.workspace-notice-list {
+  .ant-list-item {
+    padding: 0;
+  }
+
+  .ant-list-empty-text {
+    padding-block: 28px;
+  }
+}
+
+.workspace-notice-row {
+  display: grid;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 2px;
+  grid-template-columns: 14px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+
+  .ant-typography {
+    margin: 0;
+    color: @color-slate-800;
+    font-size: 12px;
+  }
+
+  time {
+    color: #94a2ae;
+    font-size: 10px;
+  }
+
+  &:hover .ant-typography {
+    color: @color-accent-700;
+  }
+}
+
+.workspace-notice-mark {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: @color-slate-200;
+}
+
+.workspace-calendar-card {
+  margin-top: 18px;
+
+  .ant-picker-calendar {
+    background: transparent;
+  }
+
+  .ant-picker-panel {
+    border-top: 0;
+  }
+
+  .ant-picker-content {
+    height: auto;
+
+    th {
+      height: 28px;
+      color: @color-slate-500;
+      font-size: 10px;
+      font-weight: 500;
+    }
+  }
+
+  .ant-picker-cell {
+    padding: 1px 0;
+  }
+
+  .ant-picker-cell-inner {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+  }
+
+  .ant-picker-cell-selected .ant-picker-cell-inner {
+    background: fade(#3278b7, 13%);
+    color: #2e6ea6;
+  }
+}
+
+.workspace-calendar-header {
+  display: flex;
+  margin-bottom: 8px;
+  align-items: center;
+  justify-content: space-between;
+
+  .ant-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .ant-typography {
+    color: @color-navy-900;
+    font-size: 12px;
+  }
+}
+
+.workspace-calendar-task-dot {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: @color-accent;
+  transform: translateX(-50%);
+}
+
+.workspace-agenda {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid @color-slate-200;
+
+  .ant-empty {
+    margin-block: 14px 4px;
+
+    .ant-empty-image {
+      height: 32px;
+    }
+
+    .ant-empty-description {
+      font-size: 11px;
+    }
+  }
+}
+
+.workspace-agenda-heading {
+  display: flex;
+  margin-bottom: 8px;
+  align-items: center;
+  justify-content: space-between;
+
+  .ant-typography {
+    font-size: 11px;
+  }
+}
+
+.workspace-agenda-item {
+  display: grid;
+  padding: 9px 4px;
+  grid-template-columns: 6px minmax(0, 1fr) 12px;
+  align-items: center;
+  gap: 10px;
+  color: @color-slate-800;
+
+  > i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: @color-accent;
+  }
+
+  strong,
+  small {
+    display: block;
+  }
+
+  strong {
+    color: @color-navy-900;
+    font-size: 11px;
+  }
+
+  small {
+    margin-top: 2px;
+    color: @color-slate-500;
+    font-size: 10px;
+  }
+
+  > .anticon {
+    color: #a3afb9;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .workspace-utility-rail {
+    position: static;
+    width: 100%;
+    min-width: 0;
+
+    &.is-collapsed {
+      width: 100%;
+      min-width: 0;
+      height: auto;
+    }
+  }
+
+  .workspace-utility-collapsed {
+    min-height: 52px;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-end;
+
+    > span {
+      width: 1px;
+      height: 22px;
+    }
+  }
+}
+
+@media (max-width: 520px) {
+  .workspace-utility-card.ant-card > .ant-card-body {
+    padding: 16px;
+  }
+}

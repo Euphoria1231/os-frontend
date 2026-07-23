@@ -9,6 +9,7 @@ const EMPLOYEE_PATH = '/api/user/employees'
 
 export const employeeService = {
   listEmployees: () => http.get<Employee[]>(EMPLOYEE_PATH),
+  listDirectReports: () => http.get<Employee[]>(`${EMPLOYEE_PATH}/direct-reports`),
   createEmployee: (values: EmployeeCreateRequest) =>
     http.post<Employee, EmployeeCreateRequest>(EMPLOYEE_PATH, values),
   updateEmployee: (id: number, values: EmployeeUpdateRequest) =>

@@ -9,5 +9,7 @@ interface AttendanceStatusTagProps {
 export const AttendanceStatusTag = memo(function AttendanceStatusTag({
   status,
 }: AttendanceStatusTagProps) {
-  return status === 'LATE' ? <Tag color="warning">迟到</Tag> : <Tag color="success">正常</Tag>
+  if (status === 'LATE') return <Tag color="warning">迟到</Tag>
+  if (status === 'MAKEUP') return <Tag color="cyan">已补签</Tag>
+  return <Tag color="success">正常</Tag>
 })

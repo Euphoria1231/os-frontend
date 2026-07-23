@@ -208,7 +208,6 @@ export const ApiPermissionPanel = memo(function ApiPermissionPanel({
       <div className="permission-panel-toolbar">
         <div>
           <Typography.Title level={4}>接口权限目录</Typography.Title>
-          <Typography.Text type="secondary">Authority 由 HTTP Method 与路径模式组合生成</Typography.Text>
         </div>
         {canCreate && (
           <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>

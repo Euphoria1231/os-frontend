@@ -4,6 +4,7 @@ import type {
   ApprovalRequest,
   ApprovalTask,
   FlowApplication,
+  MakeupApplicationRequest,
 } from './flow.types.ts'
 
 const APPLICATION_PATH = '/api/flow/applications'
@@ -15,6 +16,8 @@ export const flowService = {
     http.post<FlowApplication, ApplicationRequest>(`${APPLICATION_PATH}/leave`, values),
   submitOvertime: (values: ApplicationRequest) =>
     http.post<FlowApplication, ApplicationRequest>(`${APPLICATION_PATH}/overtime`, values),
+  submitMakeup: (values: MakeupApplicationRequest) =>
+    http.post<FlowApplication, MakeupApplicationRequest>(`${APPLICATION_PATH}/makeup`, values),
   listTodo: () => http.get<FlowApplication[]>(`${TASK_PATH}/todo`),
   listDone: () => http.get<ApprovalTask[]>(`${TASK_PATH}/done`),
   approve: (applicationId: number, values: ApprovalRequest) =>

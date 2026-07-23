@@ -5,13 +5,21 @@ import type {
   PositionRequest,
 } from '../../services/organization/organization.types.ts'
 
-export function usePositions() {
+export function usePositions(enabled = true) {
   const [positions, setPositions] = useState<Position[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<unknown>(null)
 
   useEffect(() => {
+    if (!enabled) {
+      setPositions([])
+      setLoading(false)
+      setError(null)
+      return
+    }
+
     let active = true
+    setLoading(true)
 
     organizationService
       .listPositions()
@@ -35,9 +43,12 @@ export function usePositions() {
     return () => {
       active = false
     }
-  }, [])
+  }, [enabled])
 
   const reload = useCallback(async () => {
+    if (!enabled) {
+      return
+    }
     setLoading(true)
     setError(null)
     try {
@@ -47,7 +58,7 @@ export function usePositions() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [enabled])
 
   const createPosition = useCallback(
     async (values: PositionRequest) => {

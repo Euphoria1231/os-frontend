@@ -1,4 +1,4 @@
-export type AttendanceStatus = 'NORMAL' | 'LATE'
+export type AttendanceStatus = 'NORMAL' | 'LATE' | 'MAKEUP'
 
 export interface AttendanceRecord {
   id: number
@@ -7,6 +7,8 @@ export interface AttendanceRecord {
   clockInTime: string | null
   clockOutTime: string | null
   attendanceStatus: AttendanceStatus
+  originalAttendanceStatus: AttendanceStatus | null
+  makeupApplicationId: number | null
   createdAt: string
   updatedAt: string
 }
@@ -14,4 +16,18 @@ export interface AttendanceRecord {
 export interface AttendanceRecordQuery {
   startDate: string
   endDate: string
+}
+
+export interface MakeupQuota {
+  employeeId: number
+  quotaMonth: string
+  totalCount: number
+  usedCount: number
+  remainingCount: number
+  assignedBy: number
+}
+
+export interface MakeupQuotaAssignmentRequest {
+  quotaMonth: string
+  totalCount: number
 }

@@ -3,13 +3,28 @@ import {
   ArrowRightOutlined,
   BellOutlined,
   ClockCircleOutlined,
-  SafetyCertificateOutlined,
   SolutionOutlined,
   TeamOutlined,
+  UnorderedListOutlined,
 } from '@ant-design/icons'
-import { Card, Col, Flex, Row, Tag, Typography } from 'antd'
+import {
+  Alert,
+  Badge,
+  Card,
+  Col,
+  Empty,
+  Flex,
+  List,
+  Row,
+  Tag,
+  Typography,
+} from 'antd'
 import { Link } from 'react-router-dom'
+import { WorkspaceUtilityRail } from '../../components/layout/WorkspaceUtilityRail.tsx'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
+import { useWorkspaceUtilityData } from '../../hooks/workspace/useWorkspaceUtilityData.ts'
+import { getErrorMessage } from '../../utils/error.ts'
+import { WeatherWidget } from './WeatherWidget.tsx'
 import './WorkbenchPage.less'
 
 const { Paragraph, Text, Title } = Typography
@@ -58,7 +73,10 @@ function getGreeting(): string {
 }
 
 export const WorkbenchPage = memo(function WorkbenchPage() {
-  const { user, hasAuthority, roles } = useAuth()
+  const { user, hasAuthority } = useAuth()
+  const utilityData = useWorkspaceUtilityData()
+  const { tasks, taskLoading, taskError } = utilityData
+
   const visibleCards = moduleCards.filter((item) => hasAuthority(item.authority))
   const dateLabel = new Intl.DateTimeFormat('zh-CN', {
     year: 'numeric',
@@ -69,78 +87,99 @@ export const WorkbenchPage = memo(function WorkbenchPage() {
 
   return (
     <div className="workbench-page">
-      <section className="workbench-hero">
-        <div>
-          <Tag bordered={false}>WORKBENCH</Tag>
-          <Title level={1}>
-            {getGreeting()}，{user?.realName ?? '同事'}
-          </Title>
-          <Paragraph>{dateLabel}，欢迎回到你的办公工作台。</Paragraph>
-        </div>
-        <div className="workbench-identity-card">
-          <span>
-            <SafetyCertificateOutlined />
-          </span>
-          <div>
-            <Text>当前身份</Text>
-            <Text strong>
-              {roles.has('SUPER_ADMIN')
-                ? '系统管理员'
-                : roles.has('DEPARTMENT_MANAGER')
-                  ? '部门主管'
-                  : '普通员工'}
-            </Text>
-          </div>
-        </div>
-      </section>
+      <div className="workbench-dashboard-grid">
+        <main className="workbench-main">
+          <section className="workbench-hero">
+            <div className="workbench-hero-copy">
+              <Tag bordered={false}>WORKBENCH</Tag>
+              <Title level={2}>
+                {getGreeting()}，{user?.realName ?? '同事'}
+              </Title>
+              <Paragraph>{dateLabel}，欢迎回到你的办公工作台。</Paragraph>
+            </div>
+            <WeatherWidget />
+          </section>
 
-      <section className="workbench-section">
-        <Flex justify="space-between" align="end" className="workbench-section-heading">
-          <div>
-            <Text className="workbench-eyebrow">CORE MODULES</Text>
-            <Title level={3}>常用工作入口</Title>
-          </div>
-          <Text type="secondary">入口根据当前账号权限自动呈现</Text>
-        </Flex>
+          <section className="workbench-section">
+            <div className="workbench-section-heading">
+              <div>
+                <Title level={3}>常用工作入口</Title>
+              </div>
+            </div>
 
-        <Row gutter={[18, 18]}>
-          {visibleCards.map((item) => (
-            <Col xs={24} md={12} xl={6} key={item.path}>
-              <Link to={item.path} className="workbench-module-link">
-                <Card bordered={false} className={`workbench-module-card tone-${item.tone}`}>
-                  <Flex vertical gap={24}>
-                    <Flex justify="space-between" align="center">
-                      <span className="workbench-module-icon">{item.icon}</span>
-                      <ArrowRightOutlined className="workbench-module-arrow" />
-                    </Flex>
-                    <div>
-                      <Title level={4}>{item.title}</Title>
-                      <Paragraph>{item.description}</Paragraph>
-                    </div>
-                  </Flex>
-                </Card>
-              </Link>
-            </Col>
-          ))}
-        </Row>
-      </section>
+            <Row gutter={[14, 14]}>
+              {visibleCards.map((item) => (
+                <Col xs={24} md={12} xl={6} key={item.path}>
+                  <Link to={item.path} className="workbench-module-link">
+                    <Card bordered={false} className={`workbench-module-card tone-${item.tone}`}>
+                      <Flex vertical gap={20}>
+                        <Flex justify="space-between" align="center">
+                          <span className="workbench-module-icon">{item.icon}</span>
+                          <ArrowRightOutlined className="workbench-module-arrow" />
+                        </Flex>
+                        <div>
+                          <Title level={4}>{item.title}</Title>
+                          <Paragraph>{item.description}</Paragraph>
+                        </div>
+                      </Flex>
+                    </Card>
+                  </Link>
+                </Col>
+              ))}
+            </Row>
+          </section>
 
-      <section className="workbench-system-note">
-        <div>
-          <Text className="workbench-eyebrow">SECURITY BOUNDARY</Text>
-          <Title level={4}>统一入口，清晰边界</Title>
-          <Paragraph>
-            所有业务请求统一经过 Gateway；前端菜单仅改善使用体验，真实接口权限始终由后端校验。
-          </Paragraph>
-        </div>
-        <div className="workbench-system-path">
-          <span>WEB</span>
-          <i />
-          <span>GATEWAY</span>
-          <i />
-          <span>SERVICE</span>
-        </div>
-      </section>
+          <Card bordered={false} className="workbench-panel-card workbench-task-card">
+            <div className="workbench-card-heading">
+              <div>
+                <Flex align="center" gap={10}>
+                  <Title level={3}>待办事项</Title>
+                  <Badge count={tasks.length} showZero color="#16745f" />
+                </Flex>
+              </div>
+              <Link to="/flow/applications">查看全部</Link>
+            </div>
+
+            {Boolean(taskError) && (
+              <Alert
+                type="warning"
+                showIcon
+                message="待办数据暂时无法加载"
+                description={getErrorMessage(taskError, '请稍后刷新重试')}
+              />
+            )}
+
+            <List
+              className="workbench-task-list"
+              loading={taskLoading}
+              dataSource={tasks.slice(0, 7)}
+              locale={{
+                emptyText: (
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无待办事项" />
+                ),
+              }}
+              renderItem={(task) => (
+                <List.Item>
+                  <Link to={task.path} className="workbench-task-row">
+                    <span className={`workbench-task-kind is-${task.category.toLowerCase()}`}>
+                      {task.category === 'APPROVAL' ? <SolutionOutlined /> : <UnorderedListOutlined />}
+                    </span>
+                    <span className="workbench-task-copy">
+                      <strong>{task.title}</strong>
+                      <small>{task.applicationNo} · {task.reason}</small>
+                    </span>
+                    <Tag bordered={false}>{task.statusLabel}</Tag>
+                    <time>{task.dateKey}</time>
+                    <ArrowRightOutlined />
+                  </Link>
+                </List.Item>
+              )}
+            />
+          </Card>
+        </main>
+
+        <WorkspaceUtilityRail data={utilityData} />
+      </div>
     </div>
   )
 })

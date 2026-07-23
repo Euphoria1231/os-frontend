@@ -1,4 +1,4 @@
-export type ApplicationType = 'LEAVE' | 'OVERTIME'
+export type ApplicationType = 'LEAVE' | 'OVERTIME' | 'MAKEUP'
 export type ApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 export type ApprovalAction = 'APPROVE' | 'REJECT'
 
@@ -8,14 +8,20 @@ export interface ApplicationRequest {
   reason: string
 }
 
+export interface MakeupApplicationRequest {
+  attendanceRecordId: number
+  reason: string
+}
+
 export interface FlowApplication {
   id: number
   applicationNo: string
   applicantId: number
   approverId: number
   applicationType: ApplicationType
-  startTime: string
-  endTime: string
+  attendanceRecordId: number | null
+  startTime: string | null
+  endTime: string | null
   reason: string
   status: ApplicationStatus
   createdAt: string

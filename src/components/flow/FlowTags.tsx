@@ -11,7 +11,9 @@ export const ApplicationTypeTag = memo(function ApplicationTypeTag({
 }: {
   type: ApplicationType
 }) {
-  return type === 'LEAVE' ? <Tag color="blue">请假</Tag> : <Tag color="gold">加班</Tag>
+  if (type === 'LEAVE') return <Tag color="blue">请假</Tag>
+  if (type === 'OVERTIME') return <Tag color="gold">加班</Tag>
+  return <Tag color="cyan">补签</Tag>
 })
 
 export const ApplicationStatusTag = memo(function ApplicationStatusTag({
