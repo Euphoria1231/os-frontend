@@ -1,0 +1,263 @@
+@import '../../styles/tokens.less';
+
+.global-search {
+  position: relative;
+  width: min(520px, 42vw);
+  min-width: 280px;
+}
+
+.global-search-input.ant-input-affix-wrapper {
+  height: 40px;
+  padding-inline: 13px 10px;
+  border-color: @color-slate-200;
+  border-radius: 12px;
+  background: @color-slate-50;
+  box-shadow: inset 0 1px 0 fade(@color-white, 80%);
+
+  &:hover,
+  &:focus-within {
+    border-color: fade(@color-accent, 58%);
+    background: @color-white;
+    box-shadow: 0 0 0 3px fade(@color-accent, 9%);
+  }
+
+  .ant-input-prefix {
+    color: @color-slate-500;
+  }
+}
+
+.global-search-shortcut {
+  padding: 2px 6px;
+  border: 1px solid @color-slate-200;
+  border-radius: 6px;
+  background: @color-white;
+  color: @color-slate-500;
+  font-family: @font-display;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.global-search-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  left: 0;
+  z-index: 50;
+  overflow: hidden;
+  border: 1px solid @color-slate-200;
+  border-radius: 16px;
+  background: @color-white;
+  box-shadow: 0 24px 70px fade(@color-navy-950, 20%);
+}
+
+.global-search-categories {
+  display: flex;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid @color-slate-100;
+  gap: 4px;
+
+  button {
+    padding: 6px 13px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: @color-slate-500;
+    cursor: pointer;
+    font-size: 11px;
+
+    &:hover,
+    &.is-active {
+      background: fade(@color-accent, 10%);
+      color: @color-accent-700;
+    }
+
+    &.is-active {
+      font-weight: 600;
+    }
+  }
+}
+
+.global-search-results {
+  max-height: min(520px, calc(100vh - 170px));
+  padding: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.global-search-result {
+  display: flex;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: 11px;
+  align-items: flex-start;
+  gap: 11px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover,
+  &.is-selected {
+    background: @color-slate-50;
+  }
+
+  &.is-selected {
+    box-shadow: inset 3px 0 0 @color-accent;
+  }
+}
+
+.global-search-result-icon {
+  display: grid;
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: fade(@color-accent, 11%);
+  color: @color-accent-700;
+  place-items: center;
+}
+
+.global-search-result-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.global-search-result-title {
+  overflow: hidden;
+  color: @color-navy-900;
+  font-family: @font-display;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.global-search-result-summary {
+  display: -webkit-box;
+  overflow: hidden;
+  color: @color-slate-500;
+  font-size: 11px;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.global-search-result-title,
+.global-search-result-summary {
+  mark {
+    padding: 0 2px;
+    border-radius: 3px;
+    background: #fff0a6;
+    color: @color-navy-950;
+  }
+}
+
+.global-search-result-meta {
+  display: flex;
+  margin-top: 2px;
+  align-items: center;
+  gap: 5px;
+
+  .ant-tag {
+    margin: 0;
+    background: @color-slate-100;
+    color: @color-slate-500;
+    font-size: 9px;
+    line-height: 18px;
+  }
+
+  .ant-typography {
+    margin-left: auto;
+    color: @color-slate-500;
+    font-size: 9px;
+  }
+}
+
+.global-search-result-arrow {
+  margin-top: 10px;
+  color: @color-slate-500;
+  font-size: 10px;
+}
+
+.global-search-state {
+  display: flex;
+  min-height: 190px;
+  padding: 28px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 7px;
+  color: @color-slate-500;
+  text-align: center;
+
+  > .anticon {
+    margin-bottom: 5px;
+    color: @color-accent-700;
+    font-size: 22px;
+  }
+
+  strong {
+    color: @color-navy-900;
+    font-size: 13px;
+  }
+
+  span {
+    font-size: 10px;
+  }
+
+  &.is-error strong {
+    color: #a33a3a;
+  }
+}
+
+.global-search-footer {
+  display: flex;
+  padding: 8px 12px;
+  border-top: 1px solid @color-slate-100;
+  align-items: center;
+  gap: 14px;
+  background: @color-slate-50;
+  color: @color-slate-500;
+  font-size: 9px;
+
+  kbd {
+    display: inline-grid;
+    min-width: 18px;
+    height: 18px;
+    padding-inline: 4px;
+    border: 1px solid @color-slate-200;
+    border-radius: 5px;
+    background: @color-white;
+    color: @color-slate-800;
+    font-family: @font-display;
+    place-items: center;
+  }
+}
+
+@media (max-width: 900px) {
+  .global-search {
+    width: min(420px, 48vw);
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 640px) {
+  .global-search {
+    width: min(54vw, 360px);
+    min-width: 160px;
+  }
+
+  .global-search-shortcut {
+    display: none;
+  }
+
+  .global-search-panel {
+    position: fixed;
+    top: 62px;
+    right: 10px;
+    left: 10px;
+  }
+}

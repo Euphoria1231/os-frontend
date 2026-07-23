@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import {
   CalendarOutlined,
   CheckCircleOutlined,
@@ -15,6 +15,8 @@ import {
   Card,
   Col,
   DatePicker,
+  Descriptions,
+  Drawer,
   Form,
   Input,
   Modal,
@@ -45,6 +47,7 @@ import type {
   ApplicationType,
   FlowApplication,
 } from '../../services/flow/flow.types.ts'
+import { flowService } from '../../services/flow/flow.service.ts'
 import { RequestError } from '../../services/request.ts'
 import { formatDateTime } from '../../utils/date.ts'
 import { getErrorMessage } from '../../utils/error.ts'
@@ -103,6 +106,11 @@ export const ApplicationPage = memo(function ApplicationPage() {
   const [makeupQuota, setMakeupQuota] = useState<MakeupQuota | null>()
   const [makeupLoading, setMakeupLoading] = useState(false)
   const [makeupError, setMakeupError] = useState<unknown>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [detailError, setDetailError] = useState<unknown>(null)
+  const [detailRevision, setDetailRevision] = useState(0)
+  const [focusedApplication, setFocusedApplication] = useState<FlowApplication | null>(null)
   const { message } = App.useApp()
   const { hasAuthority } = useAuth()
   const {
@@ -122,11 +130,45 @@ export const ApplicationPage = memo(function ApplicationPage() {
     && parsedApplicationId > 0
     ? parsedApplicationId
     : null
-  const visibleApplications = focusedApplicationId
-    ? applications.filter((application) => application.id === focusedApplicationId)
-    : applications
 
-  const clearApplicationFocus = () => {
+  useEffect(() => {
+    if (!focusedApplicationId) {
+      setDetailOpen(false)
+      setFocusedApplication(null)
+      setDetailError(null)
+      return
+    }
+
+    let active = true
+    setDetailOpen(true)
+    setDetailLoading(true)
+    setDetailError(null)
+    setFocusedApplication(null)
+    flowService
+      .getApplication(focusedApplicationId)
+      .then((application) => {
+        if (active) {
+          setFocusedApplication(application)
+        }
+      })
+      .catch((requestError: unknown) => {
+        if (active) {
+          setDetailError(requestError)
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setDetailLoading(false)
+        }
+      })
+
+    return () => {
+      active = false
+    }
+  }, [detailRevision, focusedApplicationId])
+
+  const closeApplicationDetail = () => {
+    setDetailOpen(false)
     const nextSearchParams = new URLSearchParams(searchParams)
     nextSearchParams.delete('applicationId')
     setSearchParams(nextSearchParams, { replace: true })
@@ -348,27 +390,6 @@ export const ApplicationPage = memo(function ApplicationPage() {
         />
       )}
 
-      {focusedApplicationId && (
-        <Alert
-          className="flow-alert"
-          type={visibleApplications.length > 0 || loading ? 'info' : 'warning'}
-          showIcon
-          message={
-            loading
-              ? `正在定位申请 #${focusedApplicationId}`
-              : visibleApplications.length > 0
-                ? `当前仅显示申请 #${focusedApplicationId}`
-                : `未找到申请 #${focusedApplicationId}`
-          }
-          description={
-            visibleApplications.length > 0
-              ? '该筛选来自个人通知跳转。'
-              : '该申请可能已不存在，或不属于当前登录员工。'
-          }
-          action={<Button size="small" onClick={clearApplicationFocus}>显示全部</Button>}
-        />
-      )}
-
       <Card bordered={false} className="flow-table-card">
         <div className="flow-table-toolbar">
           <div>
@@ -381,12 +402,99 @@ export const ApplicationPage = memo(function ApplicationPage() {
         <Table<FlowApplication>
           rowKey="id"
           columns={columns}
-          dataSource={visibleApplications}
+          dataSource={applications}
           loading={loading}
           pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (total) => `共 ${total} 条申请` }}
           scroll={{ x: 1280 }}
         />
       </Card>
+
+      <Drawer
+        title="审批申请详情"
+        open={detailOpen}
+        onClose={closeApplicationDetail}
+        width={720}
+        loading={detailLoading}
+      >
+        {detailError && !detailLoading && (
+          <Alert
+            type="warning"
+            showIcon
+            message="申请详情暂时无法加载"
+            description={getErrorMessage(detailError, '该申请可能已不存在，或当前账号无权查看')}
+            action={
+              <Button size="small" icon={<ReloadOutlined />} onClick={() => setDetailRevision((value) => value + 1)}>
+                重新加载
+              </Button>
+            }
+          />
+        )}
+
+        {focusedApplication && (
+          <article className="flow-detail">
+            <div className="flow-detail-heading">
+              <div>
+                <Typography.Text type="secondary">申请单号</Typography.Text>
+                <Typography.Title level={3}>{focusedApplication.applicationNo}</Typography.Title>
+              </div>
+              <Space wrap>
+                <ApplicationTypeTag type={focusedApplication.applicationType} />
+                <ApplicationStatusTag status={focusedApplication.status} />
+              </Space>
+            </div>
+
+            <Descriptions bordered size="small" column={{ xs: 1, sm: 2 }}>
+              <Descriptions.Item label="申请人">
+                员工 {focusedApplication.applicantId}
+              </Descriptions.Item>
+              <Descriptions.Item label="提交时间">
+                {formatDateTime(focusedApplication.createdAt)}
+              </Descriptions.Item>
+              <Descriptions.Item label="申请内容" span={2}>
+                {focusedApplication.applicationType === 'MAKEUP'
+                  ? `考勤记录 #${focusedApplication.attendanceRecordId ?? '—'}`
+                  : `${formatDateTime(focusedApplication.startTime)} 至 ${formatDateTime(focusedApplication.endTime)}`}
+              </Descriptions.Item>
+              <Descriptions.Item label="申请时长" span={2}>
+                {focusedApplication.applicationType === 'MAKEUP'
+                  ? '补签申请'
+                  : formatDuration(focusedApplication.startTime, focusedApplication.endTime)}
+              </Descriptions.Item>
+              <Descriptions.Item label="申请原因" span={2}>
+                <Typography.Paragraph className="flow-detail-reason">
+                  {focusedApplication.reason}
+                </Typography.Paragraph>
+              </Descriptions.Item>
+            </Descriptions>
+
+            <div className="flow-detail-progress">
+              <Typography.Title level={4}>审批进度</Typography.Title>
+              {focusedApplication.approvalProgress.map((task) => (
+                <div className="flow-detail-step" key={task.taskId}>
+                  <span className="flow-detail-step-index">{task.approvalLevel}</span>
+                  <div className="flow-detail-step-copy">
+                    <Space wrap>
+                      <Typography.Text strong>{task.approverName}</Typography.Text>
+                      <Typography.Text type="secondary">员工 {task.approverId}</Typography.Text>
+                      <ApprovalTaskStatusTag status={task.status} />
+                    </Space>
+                    <Typography.Text type="secondary">
+                      {task.processedAt
+                        ? `处理于 ${formatDateTime(task.processedAt)}`
+                        : task.activatedAt
+                          ? `激活于 ${formatDateTime(task.activatedAt)}`
+                          : '等待上一级审批完成后激活'}
+                    </Typography.Text>
+                    {task.comment && (
+                      <Typography.Paragraph>审批意见：{task.comment}</Typography.Paragraph>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </article>
+        )}
+      </Drawer>
 
       <Modal title="发起申请" open={modalOpen} onCancel={closeModal} footer={null} width={720}>
         <Form<ApplicationFormValues>

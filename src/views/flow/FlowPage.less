@@ -157,6 +157,84 @@
   margin-top: 20px;
 }
 
+.flow-detail-heading {
+  display: flex;
+  margin-bottom: 22px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  h3.ant-typography {
+    margin: 4px 0 0;
+    color: @color-navy-900;
+    font-family: @font-display;
+  }
+}
+
+.flow-detail-reason.ant-typography {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.flow-detail-progress {
+  margin-top: 26px;
+
+  h4.ant-typography {
+    margin-bottom: 16px;
+    color: @color-navy-900;
+    font-family: @font-display;
+  }
+}
+
+.flow-detail-step {
+  position: relative;
+  display: flex;
+  min-height: 82px;
+  gap: 13px;
+
+  &:not(:last-child)::after {
+    position: absolute;
+    top: 28px;
+    bottom: 0;
+    left: 13px;
+    width: 1px;
+    background: @color-slate-200;
+    content: '';
+  }
+}
+
+.flow-detail-step-index {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 27px;
+  min-width: 27px;
+  height: 27px;
+  border-radius: 9px;
+  background: fade(@color-accent, 13%);
+  color: @color-accent-700;
+  font-family: @font-display;
+  font-size: 11px;
+  font-weight: 700;
+  place-items: center;
+}
+
+.flow-detail-step-copy {
+  display: flex;
+  padding-bottom: 18px;
+  flex-direction: column;
+  gap: 6px;
+
+  > .ant-typography {
+    font-size: 11px;
+  }
+
+  p.ant-typography {
+    margin: 0;
+    color: @color-slate-800;
+  }
+}
+
 @media (max-width: 640px) {
   .flow-table-card.ant-card .ant-table-wrapper,
   .flow-approval-card.ant-card > .ant-card-body {

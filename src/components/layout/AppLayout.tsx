@@ -23,6 +23,7 @@ import {
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
 import { usePersonalNotificationSummary } from '../../hooks/notice/usePersonalNotificationSummary.ts'
+import { GlobalSearch } from '../search/GlobalSearch.tsx'
 import { buildNavigationItems, getNavigationTrail } from './navigation.tsx'
 import { WorkspaceUtilityRailContainer } from './WorkspaceUtilityRail.tsx'
 import './AppLayout.less'
@@ -131,7 +132,7 @@ export const AppLayout = memo(function AppLayout() {
 
       <Layout>
         <Header className="app-header">
-          <Flex align="center" gap={18}>
+          <Flex className="app-header-leading" align="center" gap={18}>
             <Button
               type="text"
               className="app-collapse-trigger"
@@ -147,7 +148,9 @@ export const AppLayout = memo(function AppLayout() {
             />
           </Flex>
 
-          <Flex align="center" gap={10}>
+          <GlobalSearch />
+
+          <Flex className="app-header-actions" align="center" justify="flex-end" gap={10}>
             <Badge count={unreadCount} size="small" overflowCount={99}>
               <Button
                 type="text"

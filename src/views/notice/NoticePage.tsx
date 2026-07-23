@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import {
   BellOutlined,
   EyeOutlined,
@@ -26,6 +26,7 @@ import {
   Tag,
   Typography,
 } from 'antd'
+import { useSearchParams } from 'react-router-dom'
 import { PageHeader } from '../../components/common/PageHeader.tsx'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
 import { useNotices } from '../../hooks/notice/useNotices.ts'
@@ -38,6 +39,7 @@ type ReadFilter = 'all' | 'unread' | 'read'
 
 export const NoticePage = memo(function NoticePage() {
   const [form] = Form.useForm<NoticePublishRequest>()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [filter, setFilter] = useState<ReadFilter>('all')
   const [keyword, setKeyword] = useState('')
   const [publishModalOpen, setPublishModalOpen] = useState(false)
@@ -50,6 +52,44 @@ export const NoticePage = memo(function NoticePage() {
   const { notices, unreadCount, loading, error, reload, publishNotice, readNotice } = useNotices()
   const canPublish = hasAuthority('POST:/api/notices')
   const canMarkRead = hasAuthority('PUT:/api/notices/*/read')
+  const noticeIdParam = searchParams.get('noticeId')
+  const parsedNoticeId = Number(noticeIdParam)
+  const focusedNoticeId = noticeIdParam !== null
+    && Number.isSafeInteger(parsedNoticeId)
+    && parsedNoticeId > 0
+    ? parsedNoticeId
+    : null
+
+  useEffect(() => {
+    if (!focusedNoticeId) {
+      return
+    }
+
+    let active = true
+    setDrawerOpen(true)
+    setDetailLoading(true)
+    readNotice(focusedNoticeId, canMarkRead)
+      .then((notice) => {
+        if (active) {
+          setSelectedNotice(notice)
+        }
+      })
+      .catch((requestError: unknown) => {
+        if (active) {
+          setSelectedNotice(null)
+          message.error(getErrorMessage(requestError, '公告详情加载失败'))
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setDetailLoading(false)
+        }
+      })
+
+    return () => {
+      active = false
+    }
+  }, [canMarkRead, focusedNoticeId, message, readNotice])
 
   const filteredNotices = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase()
@@ -87,17 +127,19 @@ export const NoticePage = memo(function NoticePage() {
     }
   }
 
-  const handleOpenNotice = async (notice: Notice) => {
+  const handleOpenNotice = (notice: Notice) => {
     setSelectedNotice(notice)
-    setDrawerOpen(true)
-    setDetailLoading(true)
-    try {
-      setSelectedNotice(await readNotice(notice.id, canMarkRead))
-    } catch (requestError) {
-      message.error(getErrorMessage(requestError, '公告详情加载失败'))
-    } finally {
-      setDetailLoading(false)
-    }
+    const nextSearchParams = new URLSearchParams(searchParams)
+    nextSearchParams.set('noticeId', String(notice.id))
+    setSearchParams(nextSearchParams)
+  }
+
+  const closeNotice = () => {
+    setDrawerOpen(false)
+    setSelectedNotice(null)
+    const nextSearchParams = new URLSearchParams(searchParams)
+    nextSearchParams.delete('noticeId')
+    setSearchParams(nextSearchParams, { replace: true })
   }
 
   const readCount = Math.max(0, notices.length - unreadCount)
@@ -171,7 +213,7 @@ export const NoticePage = memo(function NoticePage() {
           locale={{ emptyText: '暂无符合条件的公告' }}
           renderItem={(notice) => (
             <List.Item className={notice.read ? 'notice-item is-read' : 'notice-item'}>
-              <button type="button" className="notice-item-button" onClick={() => void handleOpenNotice(notice)}>
+              <button type="button" className="notice-item-button" onClick={() => handleOpenNotice(notice)}>
                 <span className="notice-item-mark"><BellOutlined /></span>
                 <div className="notice-item-content">
                   <Space size={8}>
@@ -223,7 +265,7 @@ export const NoticePage = memo(function NoticePage() {
       <Drawer
         title="公告详情"
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={closeNotice}
         width={640}
         loading={detailLoading}
       >

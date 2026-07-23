@@ -154,6 +154,12 @@
   backdrop-filter: blur(18px);
 }
 
+.app-header-leading,
+.app-header-actions {
+  min-width: 0;
+  flex: 1;
+}
+
 .app-collapse-trigger.ant-btn {
   width: 38px;
   height: 38px;
@@ -247,6 +253,11 @@
     .ant-breadcrumb {
       display: none;
     }
+  }
+
+  .app-header-leading,
+  .app-header-actions {
+    flex: none;
   }
 
   .app-user-copy,

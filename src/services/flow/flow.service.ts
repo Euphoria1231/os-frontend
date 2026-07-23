@@ -12,6 +12,8 @@ const TASK_PATH = '/api/flow/tasks'
 
 export const flowService = {
   listMyApplications: () => http.get<FlowApplication[]>(`${APPLICATION_PATH}/mine`),
+  getApplication: (applicationId: number) =>
+    http.get<FlowApplication>(`${APPLICATION_PATH}/${applicationId}`),
   submitLeave: (values: ApplicationRequest) =>
     http.post<FlowApplication, ApplicationRequest>(`${APPLICATION_PATH}/leave`, values),
   submitOvertime: (values: ApplicationRequest) =>
