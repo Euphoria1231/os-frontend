@@ -9,6 +9,7 @@ import {
 import {
   App,
   Avatar,
+  Badge,
   Breadcrumb,
   Button,
   Dropdown,
@@ -21,6 +22,7 @@ import {
 } from 'antd'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
+import { usePersonalNotificationSummary } from '../../hooks/notice/usePersonalNotificationSummary.ts'
 import { buildNavigationItems, getNavigationTrail } from './navigation.tsx'
 import { WorkspaceUtilityRailContainer } from './WorkspaceUtilityRail.tsx'
 import './AppLayout.less'
@@ -36,6 +38,7 @@ export const AppLayout = memo(function AppLayout() {
   const [mobile, setMobile] = useState(false)
   const { message } = App.useApp()
   const { user, roles, hasAuthority, logout } = useAuth()
+  const { unreadCount } = usePersonalNotificationSummary()
   const location = useLocation()
   const navigate = useNavigate()
   const navigationItems = useMemo(() => buildNavigationItems(hasAuthority), [hasAuthority])
@@ -145,17 +148,15 @@ export const AppLayout = memo(function AppLayout() {
           </Flex>
 
           <Flex align="center" gap={10}>
-            {hasAuthority('GET:/api/notices/**') && (
-              <>
-                <Button
-                  type="text"
-                  aria-label="公告通知"
-                  icon={<BellOutlined />}
-                  onClick={() => navigate('/notices')}
-                />
-                <span className="app-header-divider" />
-              </>
-            )}
+            <Badge count={unreadCount} size="small" overflowCount={99}>
+              <Button
+                type="text"
+                aria-label="个人通知"
+                icon={<BellOutlined />}
+                onClick={() => navigate('/notifications')}
+              />
+            </Badge>
+            <span className="app-header-divider" />
             <Dropdown menu={userMenu} placement="bottomRight" trigger={['click']}>
               <button type="button" className="app-user-trigger">
                 <Avatar icon={!user?.realName ? <UserOutlined /> : undefined}>

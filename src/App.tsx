@@ -15,6 +15,8 @@ import { DashboardPage } from './views/dashboard/DashboardPage.tsx'
 import { WorkbenchPage } from './views/workbench/WorkbenchPage.tsx'
 import { IntelligencePage } from './views/intelligence/IntelligencePage.tsx'
 import { OperationLogPage } from './views/operation-log/OperationLogPage.tsx'
+import { PersonalNotificationPage } from './views/notice/PersonalNotificationPage.tsx'
+import { PersonalNotificationProvider } from './hooks/notice/PersonalNotificationProvider.tsx'
 
 function App() {
   return (
@@ -26,7 +28,9 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <AppLayout />
+              <PersonalNotificationProvider>
+                <AppLayout />
+              </PersonalNotificationProvider>
             </ProtectedRoute>
           }
         >
@@ -96,6 +100,7 @@ function App() {
               </PermissionGate>
             }
           />
+          <Route path="notifications" element={<PersonalNotificationPage />} />
           <Route
             path="ai/assistant"
             element={

@@ -28,6 +28,7 @@ import {
   type TableProps,
 } from 'antd'
 import dayjs, { type Dayjs } from 'dayjs'
+import { useSearchParams } from 'react-router-dom'
 import { AttendanceStatusTag } from '../../components/attendance/AttendanceStatusTag.tsx'
 import { PageHeader } from '../../components/common/PageHeader.tsx'
 import { useAttendance } from '../../hooks/attendance/useAttendance.ts'
@@ -119,6 +120,7 @@ async function getMakeupQuotaOrNull(quotaMonth: string): Promise<MakeupQuota | n
 
 export const AttendancePage = memo(function AttendancePage() {
   const [makeupForm] = Form.useForm<MakeupFormValues>()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [now, setNow] = useState(() => new Date())
   const [range, setRange] = useState<[Dayjs, Dayjs]>(() => [
     dayjs().startOf('month'),
@@ -166,6 +168,22 @@ export const AttendancePage = memo(function AttendancePage() {
     : currentMonth
   const targetQuota = quotaByMonth[makeupTargetMonth]
   const clockAction = resolveClockAction(today)
+  const recordIdParam = searchParams.get('recordId')
+  const parsedRecordId = Number(recordIdParam)
+  const focusedRecordId = recordIdParam !== null
+    && Number.isSafeInteger(parsedRecordId)
+    && parsedRecordId > 0
+    ? parsedRecordId
+    : null
+  const visibleRecords = focusedRecordId
+    ? records.filter((record) => record.id === focusedRecordId)
+    : records
+
+  const clearRecordFocus = () => {
+    const nextSearchParams = new URLSearchParams(searchParams)
+    nextSearchParams.delete('recordId')
+    setSearchParams(nextSearchParams, { replace: true })
+  }
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000)
@@ -603,6 +621,23 @@ export const AttendancePage = memo(function AttendancePage() {
         />
       )}
 
+      {focusedRecordId && (
+        <Alert
+          className="attendance-alert"
+          type={visibleRecords.length > 0 || loading ? 'info' : 'warning'}
+          showIcon
+          message={
+            loading
+              ? `正在定位考勤记录 #${focusedRecordId}`
+              : visibleRecords.length > 0
+                ? `当前仅显示考勤记录 #${focusedRecordId}`
+                : `当前日期范围内未找到考勤记录 #${focusedRecordId}`
+          }
+          description="该筛选来自个人通知跳转；可以调整日期范围后重新查询。"
+          action={<Button size="small" onClick={clearRecordFocus}>显示全部</Button>}
+        />
+      )}
+
       <Card bordered={false} className="attendance-record-card">
         <div className="attendance-record-toolbar">
           <div>
@@ -631,7 +666,7 @@ export const AttendancePage = memo(function AttendancePage() {
         <Table<AttendanceRecord>
           rowKey="id"
           columns={columns}
-          dataSource={records}
+          dataSource={visibleRecords}
           loading={loading || applicationsLoading}
           pagination={{ pageSize: 10, showTotal: (total) => `共 ${total} 条记录` }}
           scroll={{ x: 940 }}

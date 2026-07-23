@@ -11,6 +11,7 @@ import {
   SolutionOutlined,
   TeamOutlined,
   RobotOutlined,
+  NotificationOutlined,
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 
@@ -83,6 +84,11 @@ export const navigationNodes: NavigationNode[] = [
         authority: 'GET:/api/flow/tasks/**',
       },
     ],
+  },
+  {
+    key: '/notifications',
+    label: '个人通知',
+    icon: <NotificationOutlined />,
   },
   {
     key: '/notices',

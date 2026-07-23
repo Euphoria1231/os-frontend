@@ -22,6 +22,7 @@ import {
   Typography,
   type TableProps,
 } from 'antd'
+import { useSearchParams } from 'react-router-dom'
 import {
   ApprovalActionTag,
   ApplicationTypeTag,
@@ -47,6 +48,7 @@ function getCurrentTask(application: FlowApplication) {
 
 export const ApprovalPage = memo(function ApprovalPage() {
   const [form] = Form.useForm<ApprovalRequest>()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [processTarget, setProcessTarget] = useState<FlowApplication | null>(null)
   const [processAction, setProcessAction] = useState<ProcessAction>('approve')
   const [modalOpen, setModalOpen] = useState(false)
@@ -55,6 +57,25 @@ export const ApprovalPage = memo(function ApprovalPage() {
   const { hasAuthority } = useAuth()
   const { todo, done, loading, error, reload, processApplication } = useApprovalTasks()
   const canProcess = hasAuthority('POST:/api/flow/tasks/**')
+  const applicationIdParam = searchParams.get('applicationId')
+  const parsedApplicationId = Number(applicationIdParam)
+  const focusedApplicationId = applicationIdParam !== null
+    && Number.isSafeInteger(parsedApplicationId)
+    && parsedApplicationId > 0
+    ? parsedApplicationId
+    : null
+  const visibleTodo = focusedApplicationId
+    ? todo.filter((application) => application.id === focusedApplicationId)
+    : todo
+  const visibleDone = focusedApplicationId
+    ? done.filter((task) => task.applicationId === focusedApplicationId)
+    : done
+
+  const clearApplicationFocus = () => {
+    const nextSearchParams = new URLSearchParams(searchParams)
+    nextSearchParams.delete('applicationId')
+    setSearchParams(nextSearchParams, { replace: true })
+  }
 
   const openProcessModal = (application: FlowApplication, action: ProcessAction) => {
     setProcessTarget(application)
@@ -293,17 +314,34 @@ export const ApprovalPage = memo(function ApprovalPage() {
         />
       )}
 
+      {focusedApplicationId && (
+        <Alert
+          className="flow-alert"
+          type={visibleTodo.length > 0 || visibleDone.length > 0 || loading ? 'info' : 'warning'}
+          showIcon
+          message={
+            loading
+              ? `正在定位申请 #${focusedApplicationId}`
+              : visibleTodo.length > 0 || visibleDone.length > 0
+                ? `当前仅显示申请 #${focusedApplicationId} 的审批任务`
+                : `未找到申请 #${focusedApplicationId} 的审批任务`
+          }
+          description="该筛选来自个人通知跳转；任务处理后可能从待办移动到已办。"
+          action={<Button size="small" onClick={clearApplicationFocus}>显示全部</Button>}
+        />
+      )}
+
       <Card bordered={false} className="flow-table-card flow-approval-card">
         <Tabs
           items={[
             {
               key: 'todo',
-              label: `待办审批 · ${todo.length}`,
+              label: `待办审批 · ${visibleTodo.length}`,
               children: (
                 <Table<FlowApplication>
                   rowKey="id"
                   columns={todoColumns}
-                  dataSource={todo}
+                  dataSource={visibleTodo}
                   loading={loading}
                   pagination={{ pageSize: 10, showTotal: (total) => `共 ${total} 条待办` }}
                   scroll={{ x: 1160 }}
@@ -312,12 +350,12 @@ export const ApprovalPage = memo(function ApprovalPage() {
             },
             {
               key: 'done',
-              label: `已办记录 · ${done.length}`,
+              label: `已办记录 · ${visibleDone.length}`,
               children: (
                 <Table<ApprovalTask>
                   rowKey="taskId"
                   columns={doneColumns}
-                  dataSource={done}
+                  dataSource={visibleDone}
                   loading={loading}
                   pagination={{ pageSize: 10, showTotal: (total) => `共 ${total} 条已办` }}
                   scroll={{ x: 980 }}

@@ -27,6 +27,7 @@ import {
   type TableProps,
 } from 'antd'
 import dayjs, { type Dayjs } from 'dayjs'
+import { useSearchParams } from 'react-router-dom'
 import {
   ApplicationStatusTag,
   ApplicationTypeTag,
@@ -95,6 +96,7 @@ function formatDuration(startTime: string | null, endTime: string | null): strin
 
 export const ApplicationPage = memo(function ApplicationPage() {
   const [form] = Form.useForm<ApplicationFormValues>()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [modalOpen, setModalOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [makeupRecords, setMakeupRecords] = useState<AttendanceRecord[]>([])
@@ -113,6 +115,22 @@ export const ApplicationPage = memo(function ApplicationPage() {
   } = useApplications()
   const canSubmit = hasAuthority('POST:/api/flow/applications/**')
   const selectedApplicationType = Form.useWatch('applicationType', form) ?? 'LEAVE'
+  const applicationIdParam = searchParams.get('applicationId')
+  const parsedApplicationId = Number(applicationIdParam)
+  const focusedApplicationId = applicationIdParam !== null
+    && Number.isSafeInteger(parsedApplicationId)
+    && parsedApplicationId > 0
+    ? parsedApplicationId
+    : null
+  const visibleApplications = focusedApplicationId
+    ? applications.filter((application) => application.id === focusedApplicationId)
+    : applications
+
+  const clearApplicationFocus = () => {
+    const nextSearchParams = new URLSearchParams(searchParams)
+    nextSearchParams.delete('applicationId')
+    setSearchParams(nextSearchParams, { replace: true })
+  }
 
   const openModal = () => {
     form.setFieldsValue(getDefaultValues())
@@ -330,6 +348,27 @@ export const ApplicationPage = memo(function ApplicationPage() {
         />
       )}
 
+      {focusedApplicationId && (
+        <Alert
+          className="flow-alert"
+          type={visibleApplications.length > 0 || loading ? 'info' : 'warning'}
+          showIcon
+          message={
+            loading
+              ? `正在定位申请 #${focusedApplicationId}`
+              : visibleApplications.length > 0
+                ? `当前仅显示申请 #${focusedApplicationId}`
+                : `未找到申请 #${focusedApplicationId}`
+          }
+          description={
+            visibleApplications.length > 0
+              ? '该筛选来自个人通知跳转。'
+              : '该申请可能已不存在，或不属于当前登录员工。'
+          }
+          action={<Button size="small" onClick={clearApplicationFocus}>显示全部</Button>}
+        />
+      )}
+
       <Card bordered={false} className="flow-table-card">
         <div className="flow-table-toolbar">
           <div>
@@ -342,7 +381,7 @@ export const ApplicationPage = memo(function ApplicationPage() {
         <Table<FlowApplication>
           rowKey="id"
           columns={columns}
-          dataSource={applications}
+          dataSource={visibleApplications}
           loading={loading}
           pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (total) => `共 ${total} 条申请` }}
           scroll={{ x: 1280 }}

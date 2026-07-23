@@ -1,4 +1,4 @@
-export type AttendanceStatus = 'NORMAL' | 'LATE' | 'MAKEUP'
+export type AttendanceStatus = 'NORMAL' | 'LATE' | 'EARLY_LEAVE' | 'MAKEUP'
 
 export interface AttendanceRecord {
   id: number
