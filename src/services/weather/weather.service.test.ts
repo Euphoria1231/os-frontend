@@ -5,6 +5,8 @@ import test from 'node:test'
 import {
   buildWeatherRequestUrl,
   getBrowserCoordinates,
+  parseIpLocationDetails,
+  resolveLocationDetails,
   resolveWeatherCoordinates,
   type GeolocationProvider,
 } from './weather.service.ts'
@@ -58,4 +60,38 @@ test('定位成功时使用当前坐标，失败时降级到北京坐标', async
       isFallbackLocation: true,
     },
   )
+})
+
+test('精确城市反查为空时使用 IP 城市名称降级', async () => {
+  const locationDetails = await resolveLocationDetails(
+    async () => ({}),
+    async () => ({ city: '福州' }),
+  )
+
+  assert.deepEqual(locationDetails, { city: '福州' })
+})
+
+test('精确反查只有省份时继续使用更具体的 IP 城市', async () => {
+  const locationDetails = await resolveLocationDetails(
+    async () => ({ principalSubdivision: '广东省' }),
+    async () => ({ city: '福州' }),
+  )
+
+  assert.deepEqual(locationDetails, { city: '福州' })
+})
+
+test('中文 IP 响应转换为具体的中文城市名称', () => {
+  assert.deepEqual(
+    parseIpLocationDetails({
+      ret: 'ok',
+      data: {
+        location: ['中国', '福建', '福州', '', '移动'],
+      },
+    }),
+    {
+      city: '福州',
+      principalSubdivision: '福建',
+    },
+  )
+  assert.deepEqual(parseIpLocationDetails({ ret: 'err' }), {})
 })

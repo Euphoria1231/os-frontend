@@ -91,7 +91,6 @@ export const WorkbenchPage = memo(function WorkbenchPage() {
         <main className="workbench-main">
           <section className="workbench-hero">
             <div className="workbench-hero-copy">
-              <Tag bordered={false}>WORKBENCH</Tag>
               <Title level={2}>
                 {getGreeting()}，{user?.realName ?? '同事'}
               </Title>

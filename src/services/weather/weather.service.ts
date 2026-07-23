@@ -1,5 +1,6 @@
 const OPEN_METEO_CURRENT_URL = 'https://api.open-meteo.com/v1/forecast'
 const REVERSE_GEOCODING_URL = 'https://api.bigdatacloud.net/data/reverse-geocode-client'
+const IP_GEOLOCATION_URL = 'https://myip.ipip.net/json'
 
 export interface WeatherCoordinates {
   latitude: number
@@ -148,6 +149,40 @@ function getOptionalString(
   return typeof candidate === 'string' && candidate.trim() ? candidate : undefined
 }
 
+function hasConcreteLocationDetails(details: ReverseLocationDetails): boolean {
+  return [details.city, details.locality]
+    .some((value) => typeof value === 'string' && value.trim().length > 0)
+}
+
+export function parseIpLocationDetails(value: unknown): ReverseLocationDetails {
+  if (!value || typeof value !== 'object') return {}
+
+  const record = value as Record<string, unknown>
+  if (record.ret !== 'ok' || !record.data || typeof record.data !== 'object') return {}
+
+  const location = (record.data as Record<string, unknown>).location
+  if (!Array.isArray(location)) return {}
+
+  const province = typeof location[1] === 'string' ? location[1].trim() : ''
+  const city = typeof location[2] === 'string' ? location[2].trim() : ''
+  const district = typeof location[3] === 'string' ? location[3].trim() : ''
+  const concreteLocation = city || district || province
+  if (!concreteLocation) return {}
+
+  return {
+    city: `${concreteLocation}`,
+    principalSubdivision: province || undefined,
+  }
+}
+
+export async function resolveLocationDetails(
+  getPreciseDetails: () => Promise<ReverseLocationDetails>,
+  getIpDetails: () => Promise<ReverseLocationDetails>,
+): Promise<ReverseLocationDetails> {
+  const preciseDetails = await getPreciseDetails()
+  return hasConcreteLocationDetails(preciseDetails) ? preciseDetails : getIpDetails()
+}
+
 async function getReverseLocationDetails(
   coordinates: WeatherCoordinates,
   signal?: AbortSignal,
@@ -171,6 +206,19 @@ async function getReverseLocationDetails(
       locality: getOptionalString(record, 'locality'),
       principalSubdivision: getOptionalString(record, 'principalSubdivision'),
     }
+  } catch (error) {
+    if (signal?.aborted) throw error
+    return {}
+  }
+}
+
+async function getIpLocationDetails(signal?: AbortSignal): Promise<ReverseLocationDetails> {
+  try {
+    const response = await fetch(IP_GEOLOCATION_URL, { signal })
+    if (!response.ok) return {}
+
+    const data: unknown = await response.json()
+    return parseIpLocationDetails(data)
   } catch (error) {
     if (signal?.aborted) throw error
     return {}
@@ -206,7 +254,10 @@ export async function getCurrentLocationWeather(
     getCurrentWeather(resolvedLocation.coordinates, signal),
     resolvedLocation.isFallbackLocation
       ? Promise.resolve<ReverseLocationDetails>({ city: '北京（默认）' })
-      : getReverseLocationDetails(resolvedLocation.coordinates, signal),
+      : resolveLocationDetails(
+          () => getReverseLocationDetails(resolvedLocation.coordinates, signal),
+          () => getIpLocationDetails(signal),
+        ),
   ])
 
   return {

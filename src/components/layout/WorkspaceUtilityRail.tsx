@@ -131,7 +131,6 @@ export const WorkspaceUtilityRail = memo(function WorkspaceUtilityRail({
             <span className="workspace-utility-heading-icon is-blue"><CalendarOutlined /></span>
             <div>
               <Title level={3}>日程待办</Title>
-              <Text type="secondary">与待办事项同步</Text>
             </div>
           </Flex>
         </div>
