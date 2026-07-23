@@ -49,6 +49,7 @@ export const NoticePage = memo(function NoticePage() {
   const { hasAuthority } = useAuth()
   const { notices, unreadCount, loading, error, reload, publishNotice, readNotice } = useNotices()
   const canPublish = hasAuthority('POST:/api/notices')
+  const canMarkRead = hasAuthority('PUT:/api/notices/*/read')
 
   const filteredNotices = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase()
@@ -91,7 +92,7 @@ export const NoticePage = memo(function NoticePage() {
     setDrawerOpen(true)
     setDetailLoading(true)
     try {
-      setSelectedNotice(await readNotice(notice.id))
+      setSelectedNotice(await readNotice(notice.id, canMarkRead))
     } catch (requestError) {
       message.error(getErrorMessage(requestError, '公告详情加载失败'))
     } finally {

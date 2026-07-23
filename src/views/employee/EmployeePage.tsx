@@ -52,8 +52,6 @@ const DEFAULT_VALUES: EmployeeFormValues = {
   username: '',
   password: '',
   realName: '',
-  departmentId: 0,
-  positionId: 0,
   leaderId: null,
   phone: null,
   email: null,
@@ -154,6 +152,10 @@ export const EmployeePage = memo(function EmployeePage() {
   }
 
   const handleSubmit = async (values: EmployeeFormValues) => {
+    if (!values.departmentId || !values.positionId) {
+      return
+    }
+
     setSubmitting(true)
     try {
       const commonValues: EmployeeUpdateRequest = {

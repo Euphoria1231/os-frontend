@@ -43,10 +43,16 @@ interface ApplicationFormValues {
   reason: string
 }
 
-const DEFAULT_VALUES: ApplicationFormValues = {
-  applicationType: 'LEAVE',
-  timeRange: [dayjs().add(1, 'day').hour(9).minute(0), dayjs().add(1, 'day').hour(18).minute(0)],
-  reason: '',
+function getDefaultValues(): ApplicationFormValues {
+  const targetDate = dayjs().add(1, 'day')
+  return {
+    applicationType: 'LEAVE',
+    timeRange: [
+      targetDate.hour(9).minute(0).second(0).millisecond(0),
+      targetDate.hour(18).minute(0).second(0).millisecond(0),
+    ],
+    reason: '',
+  }
 }
 
 function formatDuration(startTime: string, endTime: string): string {
@@ -66,7 +72,7 @@ export const ApplicationPage = memo(function ApplicationPage() {
   const canSubmit = hasAuthority('POST:/api/flow/applications/**')
 
   const openModal = () => {
-    form.setFieldsValue(DEFAULT_VALUES)
+    form.setFieldsValue(getDefaultValues())
     setModalOpen(true)
   }
 
@@ -217,7 +223,7 @@ export const ApplicationPage = memo(function ApplicationPage() {
         <Form<ApplicationFormValues>
           form={form}
           layout="vertical"
-          initialValues={DEFAULT_VALUES}
+          initialValues={getDefaultValues()}
           onFinish={handleSubmit}
           requiredMark="optional"
         >

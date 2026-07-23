@@ -41,4 +41,7 @@ export interface EmployeeUpdateRequest {
   status: EmployeeStatus
 }
 
-export type EmployeeFormValues = EmployeeCreateRequest
+export type EmployeeFormValues = Omit<EmployeeCreateRequest, 'departmentId' | 'positionId'> & {
+  departmentId?: number
+  positionId?: number
+}

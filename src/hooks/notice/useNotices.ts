@@ -61,9 +61,9 @@ export function useNotices() {
     [reload],
   )
 
-  const readNotice = useCallback(async (id: number) => {
+  const readNotice = useCallback(async (id: number, markAsRead = true) => {
     let detail = await noticeService.getNotice(id)
-    if (!detail.read) {
+    if (!detail.read && markAsRead) {
       await noticeService.markRead(id)
       const [updatedDetail, count] = await Promise.all([
         noticeService.getNotice(id),

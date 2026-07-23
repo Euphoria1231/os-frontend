@@ -23,7 +23,6 @@ import {
   type TableProps,
 } from 'antd'
 import dayjs, { type Dayjs } from 'dayjs'
-import 'dayjs/locale/zh-cn'
 import { AttendanceStatusTag } from '../../components/attendance/AttendanceStatusTag.tsx'
 import { PageHeader } from '../../components/common/PageHeader.tsx'
 import { useAttendance } from '../../hooks/attendance/useAttendance.ts'
@@ -34,8 +33,6 @@ import { getErrorMessage } from '../../utils/error.ts'
 import './AttendancePage.less'
 
 const { RangePicker } = DatePicker
-
-dayjs.locale('zh-cn')
 
 function formatTime(value: string | null): string {
   return value ? dayjs(value).format('HH:mm:ss') : '--:--:--'

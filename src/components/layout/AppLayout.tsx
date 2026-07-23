@@ -155,14 +155,16 @@ export const AppLayout = memo(function AppLayout() {
 
           <Flex align="center" gap={10}>
             {hasAuthority('GET:/api/notices/**') && (
-              <Button
-                type="text"
-                aria-label="公告通知"
-                icon={<BellOutlined />}
-                onClick={() => navigate('/notices')}
-              />
+              <>
+                <Button
+                  type="text"
+                  aria-label="公告通知"
+                  icon={<BellOutlined />}
+                  onClick={() => navigate('/notices')}
+                />
+                <span className="app-header-divider" />
+              </>
             )}
-            <span className="app-header-divider" />
             <Dropdown menu={userMenu} placement="bottomRight" trigger={['click']}>
               <button type="button" className="app-user-trigger">
                 <Avatar icon={!user?.realName ? <UserOutlined /> : undefined}>
