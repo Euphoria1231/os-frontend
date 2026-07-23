@@ -503,28 +503,6 @@ export const AttendancePage = memo(function AttendancePage() {
           />
         </div>
 
-        <Alert
-          className="attendance-makeup-quota-alert"
-          showIcon
-          type={targetQuota && targetQuota.remainingCount > 0 ? 'success' : 'warning'}
-          message={
-            makeupQuotaLoading
-              ? '正在查询补签额度'
-              : targetQuota
-                ? targetQuota.remainingCount > 0
-                  ? `本月还可补签 ${targetQuota.remainingCount} 次`
-                  : '本月补签额度已用完'
-                : targetQuota === null
-                  ? '直属领导尚未配置本月补签额度'
-                  : '补签额度查询失败'
-          }
-          description={
-            targetQuota
-              ? `总额度 ${targetQuota.totalCount} 次，已使用 ${targetQuota.usedCount} 次。`
-              : '补签额度由直属领导按月指定。'
-          }
-        />
-
         <Form<MakeupFormValues>
           form={makeupForm}
           layout="vertical"

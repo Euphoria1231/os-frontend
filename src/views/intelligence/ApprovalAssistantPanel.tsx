@@ -193,15 +193,6 @@ export function ApprovalAssistantPanel() {
             </Button>
           </Space>
         </Card>
-
-        <Alert
-          className="intelligence-boundary-note"
-          type="info"
-          showIcon
-          icon={<WarningOutlined />}
-          message="AI 不会自动执行审批"
-          description="分析结果不会改变申请状态，同意或驳回仍需审批人在审批中心手动操作。"
-        />
       </div>
 
       <div className="intelligence-output-column">

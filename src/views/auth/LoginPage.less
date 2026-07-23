@@ -6,9 +6,9 @@
   min-height: 100vh;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 76% 14%, fade(#a9cceb, 28%), transparent 26%),
-    radial-gradient(circle at 20% 86%, fade(#dcecf9, 48%), transparent 29%),
-    linear-gradient(145deg, @color-white 0%, #f7fafc 55%, #edf4fa 100%);
+    radial-gradient(circle at 76% 14%, fade(#e1f3ee, 68%), transparent 27%),
+    radial-gradient(circle at 20% 86%, fade(#edf7f4, 86%), transparent 30%),
+    linear-gradient(145deg, @color-white 0%, #f7fbfa 55%, #edf7f4 100%);
   grid-template-columns: minmax(480px, 1.08fr) minmax(440px, 0.92fr);
   isolation: isolate;
 }
@@ -24,10 +24,10 @@
 .login-background-figure {
   position: absolute;
   top: 50%;
-  left: 52%;
-  width: min(760px, 60vw);
+  left: 49%;
+  width: clamp(680px, 44vw, 760px);
   aspect-ratio: 4 / 3;
-  transform: translate(-18%, -50%);
+  transform: translate(-25%, -50%);
 
   &::before,
   &::after {
@@ -35,6 +35,7 @@
     z-index: 0;
     background-repeat: no-repeat;
     background-size: 100%;
+    filter: hue-rotate(-45deg) saturate(0.62) brightness(1.08);
     content: '';
   }
 
@@ -93,7 +94,7 @@
   left: 75%;
   width: 20%;
   height: 26%;
-  background: linear-gradient(to left top, #00bffb, rgba(0, 191, 251, 0));
+  background: linear-gradient(to left top, #bfe5dc, fade(#bfe5dc, 0%));
   transform: rotate(45deg);
 
   &::before {
@@ -111,7 +112,7 @@
   left: 40%;
   width: 28%;
   height: 36%;
-  background: linear-gradient(to left top, #0270d7, rgba(2, 112, 215, 0));
+  background: linear-gradient(to left top, #8fd1c1, fade(#8fd1c1, 0%));
   transform: rotate(-45deg);
 
   &::before {
@@ -129,7 +130,7 @@
   left: 60%;
   width: 42%;
   height: 56%;
-  background: linear-gradient(to left top, #00bffb, rgba(0, 191, 251, 0));
+  background: linear-gradient(to left top, #bfe5dc, fade(#bfe5dc, 0%));
 
   &::before {
     background: linear-gradient(
@@ -146,7 +147,7 @@
   left: 30%;
   width: 34%;
   height: 45%;
-  background: linear-gradient(to left top, #0270d7, rgba(2, 112, 215, 0));
+  background: linear-gradient(to left top, #8fd1c1, fade(#8fd1c1, 0%));
   transform: rotate(-135deg);
 
   &::before {
@@ -159,7 +160,7 @@
 .login-background-box-06,
 .login-background-box-07 {
   background-color: rgba(255, 255, 255, 0.96);
-  box-shadow: -20px 32px 64px rgba(109, 140, 180, 0.16);
+  box-shadow: -20px 32px 64px rgba(74, 129, 116, 0.14);
 }
 
 .login-background-box-05 {
@@ -191,7 +192,7 @@
   left: 10.1%;
   width: 14%;
   height: 19%;
-  background: #0270d7;
+  background: #8fd1c1;
   transform: rotate(-22deg);
 
   &::before {
@@ -205,7 +206,7 @@
   left: 20%;
   width: 5%;
   height: 6.5%;
-  background: #00bffb;
+  background: #bfe5dc;
   transform: rotate(-52deg);
 
   &::before {
@@ -219,7 +220,7 @@
   left: -13.8%;
   width: 2.2%;
   height: 3%;
-  background: rgba(0, 191, 251, 0.32);
+  background: fade(#8fd1c1, 32%);
   transform: rotate(-50deg);
 }
 
@@ -446,8 +447,8 @@
   > .ant-tag {
     margin: 0 0 24px;
     padding: 5px 11px;
-    background: fade(#d7e8f7, 74%);
-    color: #52789a;
+    background: fade(#e4f3ef, 74%);
+    color: #477d70;
     font-family: @font-display;
     font-size: 11px;
     font-weight: 700;
@@ -489,8 +490,8 @@
     height: 34px;
     margin-bottom: 13px;
     border-radius: 10px;
-    background: fade(#d7e8f7, 72%);
-    color: #527ca1;
+    background: fade(#e4f3ef, 72%);
+    color: #3f8f7d;
     font-size: 16px;
     place-items: center;
   }
@@ -531,19 +532,19 @@
   z-index: 1;
   display: grid;
   min-height: 100vh;
-  padding: 64px clamp(40px, 6vw, 92px);
+  padding: 64px clamp(48px, 4vw, 76px);
   background: transparent;
-  place-items: center;
+  place-items: center end;
 }
 
 .login-form-wrapper {
-  width: min(520px, 100%);
-  padding: clamp(32px, 4vw, 52px);
-  border: 1px solid fade(#83aacc, 34%);
+  width: min(470px, 100%);
+  padding: clamp(36px, 3vw, 44px);
+  border: 1px solid fade(@color-accent, 24%);
   border-radius: 24px;
-  background: fade(@color-white, 90%);
-  box-shadow: 0 28px 80px fade(@color-navy-950, 14%);
-  backdrop-filter: blur(18px);
+  background: fade(@color-white, 92%);
+  box-shadow: 0 28px 80px rgba(50, 102, 90, 0.14);
+  backdrop-filter: blur(14px);
 
   .ant-form-item {
     margin-bottom: 22px;
@@ -654,9 +655,10 @@
 
   .login-background-figure {
     top: 30%;
-    left: 36%;
-    width: 760px;
+    left: 50%;
+    width: min(720px, 100vw);
     opacity: 0.72;
+    transform: translate(-50%, -50%);
   }
 
   .login-story-panel {
@@ -679,14 +681,16 @@
   .login-form-panel {
     min-height: auto;
     padding: 64px 32px 80px;
+    place-items: center;
   }
 }
 
 @media (max-width: 600px) {
   .login-background-figure {
-    left: 18%;
+    left: 50%;
     width: 620px;
     opacity: 0.48;
+    transform: translate(-50%, -50%);
   }
 
   .login-background-box-03,
