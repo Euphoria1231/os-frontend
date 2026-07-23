@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import {
   ApartmentOutlined,
   ArrowRightOutlined,
@@ -34,6 +34,15 @@ export const LoginPage = memo(function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const destination = (location.state as LoginLocationState | null)?.from ?? '/workspace'
+  const backgroundFigureRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      backgroundFigureRef.current?.classList.add('anime-ready')
+    }, 100)
+
+    return () => window.clearTimeout(timer)
+  }, [])
 
   if (isAuthenticated) {
     return <Navigate to={destination} replace />
@@ -55,7 +64,25 @@ export const LoginPage = memo(function LoginPage() {
   }
 
   return (
-    <main className="login-page">
+    <main className="login-page has-animations">
+      <div className="login-background" aria-hidden="true">
+        <div
+          className="login-background-figure anime-element"
+          ref={backgroundFigureRef}
+        >
+          <span className="login-background-box login-background-box-01" />
+          <span className="login-background-box login-background-box-02" />
+          <span className="login-background-box login-background-box-03" />
+          <span className="login-background-box login-background-box-04" />
+          <span className="login-background-box login-background-box-05" />
+          <span className="login-background-box login-background-box-06" />
+          <span className="login-background-box login-background-box-07" />
+          <span className="login-background-box login-background-box-08" />
+          <span className="login-background-box login-background-box-09" />
+          <span className="login-background-box login-background-box-10" />
+        </div>
+      </div>
+
       <section className="login-story-panel">
         <header className="login-brand">
           <span className="login-brand-mark" aria-hidden="true">
