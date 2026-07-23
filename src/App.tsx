@@ -3,18 +3,13 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx'
 import { AppLayout } from './components/layout/AppLayout.tsx'
 import { PermissionGate } from './components/permission/PermissionGate.tsx'
 import { LoginPage } from './views/auth/LoginPage.tsx'
+import { EmployeePage } from './views/employee/EmployeePage.tsx'
 import { DepartmentPage } from './views/organization/DepartmentPage.tsx'
 import { PositionPage } from './views/organization/PositionPage.tsx'
 import { ModulePlaceholder } from './views/shared/ModulePlaceholder.tsx'
 import { WorkbenchPage } from './views/workbench/WorkbenchPage.tsx'
 
 const moduleRoutes = [
-  {
-    path: 'employees',
-    authority: 'GET:/api/user/**',
-    title: '员工管理',
-    description: '管理员工基础资料、组织关系与角色分配。',
-  },
   {
     path: 'permissions',
     authority: 'GET:/api/user/**',
@@ -75,6 +70,14 @@ function App() {
             element={
               <PermissionGate authority="GET:/api/user/**" showDenied>
                 <PositionPage />
+              </PermissionGate>
+            }
+          />
+          <Route
+            path="employees"
+            element={
+              <PermissionGate authority="GET:/api/user/**" showDenied>
+                <EmployeePage />
               </PermissionGate>
             }
           />

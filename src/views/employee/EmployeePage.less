@@ -1,0 +1,164 @@
+@import '../../styles/tokens.less';
+
+.employee-page {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+}
+
+.employee-stats {
+  margin-bottom: 18px;
+
+  .ant-card {
+    height: 100%;
+    border: 1px solid @color-slate-200;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px fade(@color-navy-900, 3%);
+  }
+
+  .ant-card-body {
+    padding: 20px 22px;
+  }
+
+  .ant-statistic-title {
+    color: @color-slate-500;
+    font-size: 12px;
+  }
+
+  .ant-statistic-content {
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 26px;
+    font-weight: 650;
+  }
+
+  .ant-statistic-content-prefix {
+    margin-right: 9px;
+    color: @color-accent-700;
+    font-size: 18px;
+  }
+
+  .ant-statistic-content-suffix {
+    color: @color-slate-500;
+    font-family: @font-body;
+    font-size: 11px;
+    font-weight: 400;
+  }
+}
+
+.employee-alert {
+  margin-bottom: 18px;
+  border-radius: 12px;
+}
+
+.employee-table-card.ant-card {
+  border: 1px solid @color-slate-200;
+  border-radius: 18px;
+  box-shadow: 0 12px 34px fade(@color-navy-900, 5%);
+
+  > .ant-card-body {
+    padding: 0;
+  }
+
+  .ant-table-wrapper {
+    padding: 0 22px 22px;
+  }
+
+  .ant-table-thead > tr > th {
+    background: @color-slate-50;
+    color: @color-slate-500;
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  .ant-table-tbody > tr > td {
+    color: @color-slate-800;
+    font-size: 12px;
+  }
+
+  .ant-tag {
+    margin: 0;
+  }
+}
+
+.employee-toolbar {
+  display: flex;
+  padding: 22px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  h4.ant-typography {
+    margin: 0 0 3px;
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 17px;
+  }
+
+  .ant-typography-secondary {
+    font-size: 11px;
+  }
+
+  .ant-input-affix-wrapper {
+    width: 240px;
+  }
+
+  .ant-select {
+    width: 120px;
+  }
+}
+
+.employee-avatar.ant-avatar {
+  background: linear-gradient(145deg, @color-navy-800, @color-navy-900);
+  color: @color-white;
+  font-family: @font-display;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.employee-primary-cell,
+.employee-organization-cell,
+.employee-contact-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .ant-typography-secondary {
+    font-size: 10px;
+  }
+}
+
+.employee-form-actions {
+  display: flex;
+  padding-top: 4px;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.employee-role-panel {
+  padding: 8px 0 12px;
+
+  .ant-typography {
+    line-height: 1.75;
+  }
+}
+
+@media (max-width: 760px) {
+  .employee-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+
+    > .ant-space {
+      display: grid;
+      grid-template-columns: 1fr auto;
+    }
+
+    .ant-input-affix-wrapper {
+      width: 100%;
+      grid-column: 1 / -1;
+    }
+  }
+
+  .employee-table-card.ant-card .ant-table-wrapper {
+    padding: 0 14px 18px;
+  }
+}

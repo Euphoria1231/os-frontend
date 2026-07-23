@@ -1,4 +1,4 @@
-import type { EmployeeStatus } from '../auth/auth.types.ts'
+import type { EmployeeStatus } from '../employee/employee.types.ts'
 
 export interface DepartmentRequest {
   parentId: number
