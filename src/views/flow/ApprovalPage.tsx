@@ -22,7 +22,11 @@ import {
   Typography,
   type TableProps,
 } from 'antd'
-import { ApprovalActionTag, ApplicationTypeTag } from '../../components/flow/FlowTags.tsx'
+import {
+  ApprovalActionTag,
+  ApplicationTypeTag,
+  ApprovalTaskStatusTag,
+} from '../../components/flow/FlowTags.tsx'
 import { PageHeader } from '../../components/common/PageHeader.tsx'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
 import { useApprovalTasks } from '../../hooks/flow/useApprovalTasks.ts'
@@ -36,6 +40,10 @@ import { getErrorMessage } from '../../utils/error.ts'
 import './FlowPage.less'
 
 type ProcessAction = 'approve' | 'reject'
+
+function getCurrentTask(application: FlowApplication) {
+  return application.approvalProgress.find((task) => task.status === 'PENDING')
+}
 
 export const ApprovalPage = memo(function ApprovalPage() {
   const [form] = Form.useForm<ApprovalRequest>()
@@ -68,10 +76,16 @@ export const ApprovalPage = memo(function ApprovalPage() {
 
     setSubmitting(true)
     try {
-      await processApplication(processTarget.id, processAction, {
+      const result = await processApplication(processTarget.id, processAction, {
         comment: values.comment?.trim() || null,
       })
-      message.success(processAction === 'approve' ? '审批已同意' : '审批已驳回')
+      message.success(
+        processAction === 'reject'
+          ? '审批已驳回'
+          : result.status === 'PENDING'
+            ? '本级审批已同意，申请已进入下一级审批'
+            : '审批已同意，申请已最终批准',
+      )
       closeModal()
     } catch (requestError) {
       message.error(getErrorMessage(requestError, '审批处理失败'))
@@ -99,6 +113,24 @@ export const ApprovalPage = memo(function ApprovalPage() {
       key: 'applicantId',
       width: 100,
       render: (applicantId: number) => `员工 ${applicantId}`,
+    },
+    {
+      title: '当前审批节点',
+      key: 'currentApprovalTask',
+      width: 190,
+      render: (_, application) => {
+        const currentTask = getCurrentTask(application)
+        return currentTask ? (
+          <div className="flow-time-cell">
+            <Typography.Text>
+              {currentTask.approvalLevel} 级 · {currentTask.approverName}
+            </Typography.Text>
+            <ApprovalTaskStatusTag status={currentTask.status} />
+          </div>
+        ) : (
+          <Typography.Text type="secondary">任务状态待刷新</Typography.Text>
+        )
+      },
     },
     {
       title: '申请内容',
@@ -184,6 +216,17 @@ export const ApprovalPage = memo(function ApprovalPage() {
       render: (applicantId: number) => `员工 ${applicantId}`,
     },
     {
+      title: '审批节点',
+      key: 'approvalLevel',
+      width: 190,
+      render: (_, task) => (
+        <div className="flow-time-cell">
+          <Typography.Text>{task.approvalLevel} 级 · {task.approverName}</Typography.Text>
+          <ApprovalTaskStatusTag status={task.status} />
+        </div>
+      ),
+    },
+    {
       title: '处理结果',
       dataIndex: 'action',
       key: 'action',
@@ -207,13 +250,23 @@ export const ApprovalPage = memo(function ApprovalPage() {
 
   const approvedCount = done.filter((task) => task.action === 'APPROVE').length
   const rejectedCount = done.filter((task) => task.action === 'REJECT').length
+  const currentProcessTask = processTarget ? getCurrentTask(processTarget) : undefined
+  const nextWaitingTask = processTarget?.approvalProgress.find(
+    (task) => task.status === 'WAITING'
+      && (!currentProcessTask || task.approvalLevel > currentProcessTask.approvalLevel),
+  )
+  const processDescription = processAction === 'reject'
+    ? '驳回后申请立即结束，尚未激活的后续审批任务将取消。'
+    : nextWaitingTask
+      ? `同意后将流转至 ${nextWaitingTask.approverName}，申请仍保持审批中。`
+      : '这是最后一个有效审批节点，同意后申请将最终批准。'
 
   return (
     <section className="flow-page">
       <PageHeader
         eyebrow="WORKFLOW / APPROVALS"
         title="审批中心"
-        description="处理直属员工提交的请假、加班与补签申请，并查看个人已办审批记录。"
+        description="处理当前分配给我的请假、加班与补签审批任务，并查看个人已办记录。"
         extra={<Button icon={<ReloadOutlined />} loading={loading} onClick={() => void reload()}>刷新任务</Button>}
       />
 
@@ -253,7 +306,7 @@ export const ApprovalPage = memo(function ApprovalPage() {
                   dataSource={todo}
                   loading={loading}
                   pagination={{ pageSize: 10, showTotal: (total) => `共 ${total} 条待办` }}
-                  scroll={{ x: 980 }}
+                  scroll={{ x: 1160 }}
                 />
               ),
             },
@@ -262,12 +315,12 @@ export const ApprovalPage = memo(function ApprovalPage() {
               label: `已办记录 · ${done.length}`,
               children: (
                 <Table<ApprovalTask>
-                  rowKey={(task) => `${task.applicationId}-${task.processedAt}`}
+                  rowKey="taskId"
                   columns={doneColumns}
                   dataSource={done}
                   loading={loading}
                   pagination={{ pageSize: 10, showTotal: (total) => `共 ${total} 条已办` }}
-                  scroll={{ x: 850 }}
+                  scroll={{ x: 980 }}
                 />
               ),
             },
@@ -287,15 +340,27 @@ export const ApprovalPage = memo(function ApprovalPage() {
             type={processAction === 'approve' ? 'info' : 'warning'}
             showIcon
             message={processAction === 'approve' ? '确认同意该申请' : '确认驳回该申请'}
-            description="提交后该单据将进入终态，不能重复审批。"
+            description={processDescription}
           />
           <Form.Item
             className="flow-comment-field"
             label="审批意见"
             name="comment"
-            rules={[{ max: 500, message: '审批意见不能超过 500 个字符' }]}
+            rules={[
+              {
+                required: processAction === 'reject',
+                whitespace: true,
+                message: '驳回时请填写审批意见',
+              },
+              { max: 500, message: '审批意见不能超过 500 个字符' },
+            ]}
           >
-            <Input.TextArea rows={4} maxLength={500} showCount placeholder="可填写处理说明" />
+            <Input.TextArea
+              rows={4}
+              maxLength={500}
+              showCount
+              placeholder={processAction === 'reject' ? '请填写驳回原因' : '可填写处理说明'}
+            />
           </Form.Item>
           <div className="flow-form-actions">
             <Button onClick={closeModal}>取消</Button>

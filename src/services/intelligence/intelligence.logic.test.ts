@@ -28,6 +28,7 @@ function createApplication(
     status: 'PENDING',
     createdAt,
     updatedAt: createdAt,
+    approvalProgress: [],
     ...overrides,
   }
 }

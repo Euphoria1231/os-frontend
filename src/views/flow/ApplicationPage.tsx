@@ -20,13 +20,18 @@ import {
   Modal,
   Row,
   Select,
+  Space,
   Statistic,
   Table,
   Typography,
   type TableProps,
 } from 'antd'
 import dayjs, { type Dayjs } from 'dayjs'
-import { ApplicationStatusTag, ApplicationTypeTag } from '../../components/flow/FlowTags.tsx'
+import {
+  ApplicationStatusTag,
+  ApplicationTypeTag,
+  ApprovalTaskStatusTag,
+} from '../../components/flow/FlowTags.tsx'
 import { PageHeader } from '../../components/common/PageHeader.tsx'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
 import { useApplications } from '../../hooks/flow/useApplications.ts'
@@ -246,11 +251,25 @@ export const ApplicationPage = memo(function ApplicationPage() {
       ellipsis: true,
     },
     {
-      title: '审批人',
-      dataIndex: 'approverId',
-      key: 'approverId',
-      width: 100,
-      render: (approverId: number) => `员工 ${approverId}`,
+      title: '审批进度',
+      dataIndex: 'approvalProgress',
+      key: 'approvalProgress',
+      width: 280,
+      render: (approvalProgress: FlowApplication['approvalProgress']) =>
+        approvalProgress.length ? (
+          <Space direction="vertical" size={3}>
+            {approvalProgress.map((task) => (
+              <Space key={task.taskId} size={4} wrap>
+                <Typography.Text>
+                  {task.approvalLevel} 级 · {task.approverName}
+                </Typography.Text>
+                <ApprovalTaskStatusTag status={task.status} />
+              </Space>
+            ))}
+          </Space>
+        ) : (
+          <Typography.Text type="secondary">暂无审批节点</Typography.Text>
+        ),
     },
     {
       title: '状态',
@@ -326,7 +345,7 @@ export const ApplicationPage = memo(function ApplicationPage() {
           dataSource={applications}
           loading={loading}
           pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (total) => `共 ${total} 条申请` }}
-          scroll={{ x: 1100 }}
+          scroll={{ x: 1280 }}
         />
       </Card>
 

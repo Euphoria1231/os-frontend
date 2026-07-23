@@ -22,6 +22,7 @@ function createApplication(
     status: 'PENDING',
     createdAt: '2026-07-22T10:00:00',
     updatedAt: '2026-07-22T10:00:00',
+    approvalProgress: [],
     ...overrides,
   }
 }

@@ -4,6 +4,7 @@ import type {
   ApplicationStatus,
   ApplicationType,
   ApprovalAction,
+  ApprovalTaskStatus,
 } from '../../services/flow/flow.types.ts'
 
 export const ApplicationTypeTag = memo(function ApplicationTypeTag({
@@ -32,4 +33,16 @@ export const ApprovalActionTag = memo(function ApprovalActionTag({
   action: ApprovalAction
 }) {
   return action === 'APPROVE' ? <Tag color="success">同意</Tag> : <Tag color="error">驳回</Tag>
+})
+
+export const ApprovalTaskStatusTag = memo(function ApprovalTaskStatusTag({
+  status,
+}: {
+  status: ApprovalTaskStatus
+}) {
+  if (status === 'WAITING') return <Tag>等待上一级</Tag>
+  if (status === 'PENDING') return <Tag color="processing">待审批</Tag>
+  if (status === 'APPROVED') return <Tag color="success">已同意</Tag>
+  if (status === 'REJECTED') return <Tag color="error">已驳回</Tag>
+  return <Tag>已取消</Tag>
 })
