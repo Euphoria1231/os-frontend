@@ -1,0 +1,163 @@
+@import '../../styles/tokens.less';
+
+.permission-page {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+}
+
+.permission-stats {
+  margin-bottom: 18px;
+
+  .ant-card {
+    height: 100%;
+    border: 1px solid @color-slate-200;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px fade(@color-navy-900, 3%);
+  }
+
+  .ant-card-body {
+    padding: 20px 22px;
+  }
+
+  .ant-statistic-title {
+    color: @color-slate-500;
+    font-size: 12px;
+  }
+
+  .ant-statistic-content {
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 26px;
+    font-weight: 650;
+  }
+
+  .ant-statistic-content-prefix {
+    margin-right: 9px;
+    color: @color-accent-700;
+    font-size: 18px;
+  }
+
+  .ant-statistic-content-suffix {
+    color: @color-slate-500;
+    font-family: @font-body;
+    font-size: 11px;
+    font-weight: 400;
+  }
+}
+
+.permission-alert {
+  margin-bottom: 18px;
+  border-radius: 12px;
+}
+
+.permission-workspace.ant-card {
+  border: 1px solid @color-slate-200;
+  border-radius: 18px;
+  box-shadow: 0 12px 34px fade(@color-navy-900, 5%);
+
+  > .ant-card-body {
+    padding: 0 22px 22px;
+  }
+
+  .ant-tabs-nav {
+    margin-bottom: 0;
+  }
+
+  .ant-tabs-tab {
+    padding: 18px 4px;
+    font-size: 12px;
+  }
+
+  .ant-table-thead > tr > th {
+    background: @color-slate-50;
+    color: @color-slate-500;
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  .ant-table-tbody > tr > td {
+    color: @color-slate-800;
+    font-size: 12px;
+  }
+}
+
+.permission-panel-toolbar {
+  display: flex;
+  padding: 22px 0 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  h4.ant-typography {
+    margin: 0 0 3px;
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 17px;
+  }
+
+  .ant-typography-secondary {
+    font-size: 11px;
+  }
+}
+
+.permission-primary-cell,
+.permission-code-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  .ant-tag {
+    width: fit-content;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: @color-slate-500;
+    font-family: @font-display;
+    font-size: 9px;
+    line-height: 1.4;
+    letter-spacing: 0.06em;
+  }
+
+  .ant-typography-secondary {
+    font-size: 10px;
+  }
+}
+
+.permission-form-actions {
+  display: flex;
+  padding-top: 4px;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.permission-grant-form {
+  display: flex;
+  padding: 6px 0 8px;
+  flex-direction: column;
+  gap: 18px;
+
+  > div:not(.ant-alert) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ant-select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .permission-workspace.ant-card > .ant-card-body {
+    padding: 0 14px 18px;
+  }
+
+  .permission-panel-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+
+    .ant-btn {
+      width: 100%;
+    }
+  }
+}

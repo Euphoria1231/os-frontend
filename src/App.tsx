@@ -6,16 +6,11 @@ import { LoginPage } from './views/auth/LoginPage.tsx'
 import { EmployeePage } from './views/employee/EmployeePage.tsx'
 import { DepartmentPage } from './views/organization/DepartmentPage.tsx'
 import { PositionPage } from './views/organization/PositionPage.tsx'
+import { PermissionPage } from './views/permission/PermissionPage.tsx'
 import { ModulePlaceholder } from './views/shared/ModulePlaceholder.tsx'
 import { WorkbenchPage } from './views/workbench/WorkbenchPage.tsx'
 
 const moduleRoutes = [
-  {
-    path: 'permissions',
-    authority: 'GET:/api/user/**',
-    title: '权限管理',
-    description: '配置角色、菜单和后端接口权限。',
-  },
   {
     path: 'attendance',
     authority: 'GET:/api/attendance/**',
@@ -78,6 +73,14 @@ function App() {
             element={
               <PermissionGate authority="GET:/api/user/**" showDenied>
                 <EmployeePage />
+              </PermissionGate>
+            }
+          />
+          <Route
+            path="permissions"
+            element={
+              <PermissionGate authority="GET:/api/user/**" showDenied>
+                <PermissionPage />
               </PermissionGate>
             }
           />

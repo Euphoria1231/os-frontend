@@ -9,6 +9,19 @@ export interface Role {
   updatedAt: string
 }
 
+export interface RoleRequest {
+  code: string
+  name: string
+  status: EmployeeStatus
+}
+
+export interface RoleGrantRequest {
+  menuIds: number[]
+  apiPermissionIds: number[]
+}
+
+export type MenuType = 'DIRECTORY' | 'MENU' | 'BUTTON'
+
 export interface MenuPermission {
   id: number
   parentId: number
@@ -16,23 +29,44 @@ export interface MenuPermission {
   path: string | null
   component: string | null
   permission: string | null
-  type: 'DIRECTORY' | 'MENU' | 'BUTTON'
+  type: MenuType
   sortOrder: number
   status: EmployeeStatus
   createdAt: string
   updatedAt: string
 }
 
+export interface MenuPermissionRequest {
+  parentId: number
+  name: string
+  path?: string | null
+  component?: string | null
+  permission?: string | null
+  type: MenuType
+  sortOrder: number
+  status: EmployeeStatus
+}
+
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+
 export interface ApiPermission {
   id: number
   code: string
   name: string
-  httpMethod: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+  httpMethod: HttpMethod
   pathPattern: string
   authority: string
   status: EmployeeStatus
   createdAt: string
   updatedAt: string
+}
+
+export interface ApiPermissionRequest {
+  code: string
+  name: string
+  httpMethod: HttpMethod
+  pathPattern: string
+  status: EmployeeStatus
 }
 
 export interface EmployeeAuthorization {
