@@ -8,7 +8,7 @@ import {
   SafetyCertificateOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { App, Button, Flex, Form, Input, Space, Tag, Typography } from 'antd'
+import { App, Button, Form, Input, Space, Tag, Typography } from 'antd'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
 import { RequestError } from '../../services/request.ts'
@@ -22,9 +22,9 @@ interface LoginLocationState {
 }
 
 const capabilityItems = [
-  { icon: <ApartmentOutlined />, title: '组织权限', detail: '部门、岗位、员工与 RBAC' },
-  { icon: <ClockCircleOutlined />, title: '协同办公', detail: '考勤、审批与公告闭环' },
-  { icon: <SafetyCertificateOutlined />, title: '统一安全', detail: 'Gateway JWT 与接口鉴权' },
+  { icon: <ApartmentOutlined />, title: '组织权限', detail: '' },
+  { icon: <ClockCircleOutlined />, title: '协同办公', detail: '' },
+  { icon: <SafetyCertificateOutlined />, title: '统一安全', detail: '' },
 ]
 
 export const LoginPage = memo(function LoginPage() {
@@ -97,9 +97,7 @@ export const LoginPage = memo(function LoginPage() {
         <div className="login-story-content">
           <Tag bordered={false}>WORK, CLEARLY.</Tag>
           <Title>把每一次协作，沉淀为清晰的工作进展。</Title>
-          <Paragraph>
-            从组织权限到考勤审批，在一个克制、稳定的工作入口中连接人与流程。
-          </Paragraph>
+          
 
           <div className="login-capabilities">
             {capabilityItems.map((item) => (
@@ -175,14 +173,9 @@ export const LoginPage = memo(function LoginPage() {
 
           <Link to="/dashboard" className="login-dashboard-entry">
             <FundProjectionScreenOutlined />
-            <span>免登录查看企业数据大屏</span>
+            <span>查看企业数据大屏</span>
             <ArrowRightOutlined />
           </Link>
-
-          <Flex justify="center" className="login-security-note">
-            <SafetyCertificateOutlined />
-            <Text>登录状态由 JWT 与 Gateway 安全校验保护</Text>
-          </Flex>
         </div>
       </section>
     </main>
