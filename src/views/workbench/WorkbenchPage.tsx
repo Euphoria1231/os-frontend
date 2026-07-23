@@ -3,7 +3,6 @@ import {
   ArrowRightOutlined,
   BellOutlined,
   ClockCircleOutlined,
-  RadarChartOutlined,
   SolutionOutlined,
   TeamOutlined,
   UnorderedListOutlined,

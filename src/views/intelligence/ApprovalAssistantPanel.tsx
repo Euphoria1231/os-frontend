@@ -3,7 +3,6 @@ import {
   FileDoneOutlined,
   ReloadOutlined,
   RobotOutlined,
-  WarningOutlined,
 } from '@ant-design/icons'
 import { Alert, App, Button, Card, Empty, Select, Space, Tag, Typography } from 'antd'
 import { useAuth } from '../../hooks/auth/useAuth.ts'

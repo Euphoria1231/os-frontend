@@ -12,14 +12,10 @@ export function useDepartments(enabled = true) {
 
   useEffect(() => {
     if (!enabled) {
-      setDepartments([])
-      setLoading(false)
-      setError(null)
       return
     }
 
     let active = true
-    setLoading(true)
 
     organizationService
       .listDepartments()
@@ -87,9 +83,9 @@ export function useDepartments(enabled = true) {
   )
 
   return {
-    departments,
-    loading,
-    error,
+    departments: enabled ? departments : [],
+    loading: enabled ? loading : false,
+    error: enabled ? error : null,
     reload,
     createDepartment,
     updateDepartment,

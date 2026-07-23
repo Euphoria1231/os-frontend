@@ -12,14 +12,10 @@ export function usePositions(enabled = true) {
 
   useEffect(() => {
     if (!enabled) {
-      setPositions([])
-      setLoading(false)
-      setError(null)
       return
     }
 
     let active = true
-    setLoading(true)
 
     organizationService
       .listPositions()
@@ -87,9 +83,9 @@ export function usePositions(enabled = true) {
   )
 
   return {
-    positions,
-    loading,
-    error,
+    positions: enabled ? positions : [],
+    loading: enabled ? loading : false,
+    error: enabled ? error : null,
     reload,
     createPosition,
     updatePosition,
