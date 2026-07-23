@@ -14,6 +14,7 @@ import { PermissionPage } from './views/permission/PermissionPage.tsx'
 import { DashboardPage } from './views/dashboard/DashboardPage.tsx'
 import { WorkbenchPage } from './views/workbench/WorkbenchPage.tsx'
 import { IntelligencePage } from './views/intelligence/IntelligencePage.tsx'
+import { OperationLogPage } from './views/operation-log/OperationLogPage.tsx'
 
 function App() {
   return (
@@ -103,6 +104,7 @@ function App() {
               </PermissionGate>
             }
           />
+          <Route path="operation-logs" element={<OperationLogPage />} />
           <Route path="foundation" element={<Navigate to="/workspace" replace />} />
           <Route path="*" element={<Navigate to="/workspace" replace />} />
         </Route>

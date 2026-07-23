@@ -5,6 +5,7 @@ import {
   BellOutlined,
   ClockCircleOutlined,
   DashboardOutlined,
+  FileSearchOutlined,
   IdcardOutlined,
   SafetyCertificateOutlined,
   SolutionOutlined,
@@ -94,6 +95,11 @@ export const navigationNodes: NavigationNode[] = [
     label: '智能办公',
     icon: <RobotOutlined />,
     authority: 'POST:/api/intelligence/ai/**',
+  },
+  {
+    key: '/operation-logs',
+    label: '操作日志',
+    icon: <FileSearchOutlined />,
   },
 ]
 
