@@ -9,18 +9,9 @@ import { ApplicationPage } from './views/flow/ApplicationPage.tsx'
 import { ApprovalPage } from './views/flow/ApprovalPage.tsx'
 import { DepartmentPage } from './views/organization/DepartmentPage.tsx'
 import { PositionPage } from './views/organization/PositionPage.tsx'
+import { NoticePage } from './views/notice/NoticePage.tsx'
 import { PermissionPage } from './views/permission/PermissionPage.tsx'
-import { ModulePlaceholder } from './views/shared/ModulePlaceholder.tsx'
 import { WorkbenchPage } from './views/workbench/WorkbenchPage.tsx'
-
-const moduleRoutes = [
-  {
-    path: 'notices',
-    authority: 'GET:/api/notices/**',
-    title: '公告通知',
-    description: '查看公司公告并维护个人已读状态。',
-  },
-]
 
 function App() {
   return (
@@ -93,17 +84,14 @@ function App() {
               </PermissionGate>
             }
           />
-          {moduleRoutes.map((route) => (
-            <Route
-              key={route.path}
-              path={route.path}
-              element={
-                <PermissionGate authority={route.authority} showDenied>
-                  <ModulePlaceholder title={route.title} description={route.description} />
-                </PermissionGate>
-              }
-            />
-          ))}
+          <Route
+            path="notices"
+            element={
+              <PermissionGate authority="GET:/api/notices/**" showDenied>
+                <NoticePage />
+              </PermissionGate>
+            }
+          />
           <Route path="foundation" element={<Navigate to="/workspace" replace />} />
           <Route path="*" element={<Navigate to="/workspace" replace />} />
         </Route>
