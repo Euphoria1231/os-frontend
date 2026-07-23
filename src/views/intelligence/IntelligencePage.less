@@ -1,0 +1,409 @@
+@import '../../styles/tokens.less';
+
+.intelligence-workspace {
+  display: grid;
+  align-items: start;
+  gap: 18px;
+  grid-template-columns: minmax(320px, 0.82fr) minmax(440px, 1.18fr);
+}
+
+.intelligence-control-column,
+.intelligence-output-column {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.intelligence-control-card.ant-card,
+.intelligence-result-card.ant-card,
+.intelligence-empty-result.ant-card {
+  border: 1px solid @color-slate-200;
+  border-radius: 20px;
+  box-shadow: 0 16px 42px fade(@color-navy-900, 6%);
+}
+
+.intelligence-control-card {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, @color-accent, fade(@color-accent, 12%));
+    content: '';
+  }
+
+  > .ant-card-body {
+    padding: 28px;
+  }
+
+  h3.ant-typography {
+    margin: 9px 0 6px;
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 23px;
+  }
+
+  p.ant-typography {
+    margin-bottom: 24px;
+    font-size: 12px;
+    line-height: 1.75;
+  }
+}
+
+.intelligence-card-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: @color-accent-700;
+  font-family: @font-display;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+.intelligence-field-label {
+  display: block;
+  margin-bottom: 8px;
+  color: @color-slate-800;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.intelligence-wide-control {
+  width: 100%;
+}
+
+.intelligence-selection-summary {
+  display: grid;
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid @color-slate-200;
+  border-radius: 14px;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  background: @color-slate-50;
+
+  > div {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 5px;
+
+    > span {
+      color: @color-slate-500;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    > strong {
+      color: @color-navy-900;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .ant-tag {
+      width: fit-content;
+      margin: 0;
+    }
+  }
+
+  .intelligence-selection-reason {
+    grid-column: 1 / -1;
+  }
+}
+
+.intelligence-form-actions {
+  display: flex;
+  margin-top: 22px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  .ant-btn-primary {
+    min-width: 164px;
+  }
+}
+
+.intelligence-inline-alert {
+  margin: 16px 0;
+  border-radius: 12px;
+}
+
+.intelligence-boundary-note {
+  border: 1px solid fade(@color-accent, 22%);
+  border-radius: 14px;
+  background: fade(@color-accent, 5%);
+}
+
+.intelligence-identity-card {
+  display: flex;
+  margin-bottom: 22px;
+  padding: 15px 16px;
+  border: 1px solid @color-slate-200;
+  border-radius: 14px;
+  align-items: center;
+  gap: 12px;
+  background: @color-slate-50;
+
+  > span {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: @color-navy-900;
+    color: @color-white;
+    place-items: center;
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+
+    small,
+    em {
+      color: @color-slate-500;
+      font-size: 9px;
+      font-style: normal;
+    }
+
+    strong {
+      color: @color-navy-900;
+      font-family: @font-display;
+      font-size: 14px;
+    }
+  }
+}
+
+.intelligence-result-card {
+  position: relative;
+  min-height: 448px;
+  overflow: hidden;
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: @color-accent;
+    content: '';
+  }
+
+  &.intelligence-result-degraded::before {
+    background: #d99a2b;
+  }
+
+  &.intelligence-result-failed::before {
+    background: #d14b55;
+  }
+
+  > .ant-card-body {
+    padding: 28px 30px;
+  }
+}
+
+.intelligence-result-heading {
+  display: flex;
+  margin-bottom: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+
+  h4.ant-typography {
+    margin: 0;
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 19px;
+  }
+
+  p.ant-typography {
+    margin: 5px 0 0;
+    font-size: 10px;
+  }
+}
+
+.intelligence-status-alert {
+  margin-bottom: 20px;
+  border-radius: 12px;
+}
+
+.intelligence-result-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.intelligence-result-section,
+.intelligence-advice-block {
+  > span {
+    display: block;
+    margin-bottom: 7px;
+    color: @color-slate-500;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+  }
+
+  p.ant-typography {
+    margin: 0;
+    color: @color-slate-800;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+}
+
+.intelligence-advice-block {
+  padding: 18px;
+  border-left: 3px solid @color-accent;
+  border-radius: 0 12px 12px 0;
+  background: fade(@color-accent, 7%);
+}
+
+.intelligence-insight-list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+
+  li {
+    position: relative;
+    padding-left: 17px;
+    color: @color-slate-800;
+    font-size: 12px;
+    line-height: 1.65;
+
+    &::before {
+      position: absolute;
+      top: 0.65em;
+      left: 0;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: @color-accent;
+      content: '';
+    }
+  }
+}
+
+.intelligence-disclaimer {
+  display: flex;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid @color-slate-200;
+  align-items: flex-start;
+  gap: 8px;
+  color: @color-slate-500;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.intelligence-risk-banner {
+  display: flex;
+  padding: 18px;
+  border: 1px solid @color-slate-200;
+  border-radius: 14px;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(100deg, @color-slate-50, @color-white);
+
+  > div {
+    display: flex;
+    flex-direction: column;
+
+    span {
+      color: @color-slate-500;
+      font-size: 9px;
+    }
+
+    strong {
+      color: @color-navy-900;
+      font-family: @font-display;
+      font-size: 24px;
+    }
+  }
+}
+
+.intelligence-empty-result {
+  min-height: 448px;
+  background:
+    radial-gradient(circle at 75% 16%, fade(@color-accent, 13%), transparent 30%),
+    linear-gradient(145deg, @color-white, @color-slate-50);
+
+  > .ant-card-body {
+    display: flex;
+    min-height: 446px;
+    padding: 50px;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+
+  > .ant-card-body > .anticon {
+    display: grid;
+    width: 66px;
+    height: 66px;
+    margin-bottom: 20px;
+    border: 1px solid fade(@color-accent, 24%);
+    border-radius: 20px;
+    background: fade(@color-accent, 8%);
+    color: @color-accent-700;
+    font-size: 26px;
+    place-items: center;
+  }
+
+  h3.ant-typography {
+    margin-bottom: 6px;
+    color: @color-navy-900;
+    font-family: @font-display;
+  }
+
+  p.ant-typography {
+    max-width: 390px;
+    font-size: 11px;
+    line-height: 1.75;
+  }
+}
+
+@media (max-width: 1080px) {
+  .intelligence-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .intelligence-control-card > .ant-card-body,
+  .intelligence-result-card > .ant-card-body {
+    padding: 22px 18px;
+  }
+
+  .intelligence-result-heading {
+    flex-direction: column;
+  }
+
+  .intelligence-selection-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .intelligence-selection-summary .intelligence-selection-reason {
+    grid-column: auto;
+  }
+
+  .intelligence-form-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+
+    .ant-btn {
+      width: 100%;
+    }
+  }
+}

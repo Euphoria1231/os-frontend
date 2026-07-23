@@ -3,6 +3,7 @@ import type {
   AiStatusMeta,
   OfficeQuestionRequest,
 } from './intelligence.types.ts'
+import type { FlowApplication } from '../flow/flow.types.ts'
 
 const QUESTION_MAX_LENGTH = 500
 
@@ -42,4 +43,24 @@ export function buildOfficeQuestionRequest(question: string): OfficeQuestionRequ
 
 export function getAiStatusMeta(status: AiCallStatus): AiStatusMeta {
   return STATUS_META[status]
+}
+
+export function mergeApprovalCandidates(
+  applications: FlowApplication[],
+  todoApplications: FlowApplication[],
+): FlowApplication[] {
+  const candidatesById = new Map<number, FlowApplication>()
+
+  for (const application of [...applications, ...todoApplications]) {
+    if (application.applicationType === 'MAKEUP') {
+      continue
+    }
+    if (!candidatesById.has(application.id)) {
+      candidatesById.set(application.id, application)
+    }
+  }
+
+  return [...candidatesById.values()].sort((left, right) =>
+    right.createdAt.localeCompare(left.createdAt),
+  )
 }
