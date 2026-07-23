@@ -8,6 +8,7 @@ import type {
   MenuPermissionRequest,
   Role,
   RoleGrantRequest,
+  RoleGrantResponse,
   RoleRequest,
 } from './rbac.types.ts'
 
@@ -22,6 +23,8 @@ export const rbacService = {
   updateRole: (id: number, values: RoleRequest) =>
     http.put<Role, RoleRequest>(`${ROLE_PATH}/${id}`, values),
   deleteRole: (id: number) => http.delete<void>(`${ROLE_PATH}/${id}`),
+  getRolePermissions: (roleId: number) =>
+    http.get<RoleGrantResponse>(`${ROLE_PATH}/${roleId}/permissions`),
   assignRolePermissions: (roleId: number, values: RoleGrantRequest) =>
     http.put<void, RoleGrantRequest>(`${ROLE_PATH}/${roleId}/permissions`, values),
   listMenus: () => http.get<MenuPermission[]>(MENU_PATH),

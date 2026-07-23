@@ -20,6 +20,11 @@ export interface RoleGrantRequest {
   apiPermissionIds: number[]
 }
 
+export interface RoleGrantResponse {
+  menuIds: number[]
+  apiPermissionIds: number[]
+}
+
 export type MenuType = 'DIRECTORY' | 'MENU' | 'BUTTON'
 
 export interface MenuPermission {

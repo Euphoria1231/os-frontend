@@ -85,6 +85,10 @@ export function useRbacData() {
     await reload()
   }, [reload])
 
+  const getRolePermissions = useCallback(async (id: number) => (
+    rbacService.getRolePermissions(id)
+  ), [])
+
   const assignRolePermissions = useCallback(async (id: number, values: RoleGrantRequest) => {
     await rbacService.assignRolePermissions(id, values)
   }, [])
@@ -133,6 +137,7 @@ export function useRbacData() {
     createRole,
     updateRole,
     deleteRole,
+    getRolePermissions,
     assignRolePermissions,
     createMenu,
     updateMenu,

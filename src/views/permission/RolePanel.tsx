@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { memo, useRef, useState } from 'react'
 import {
   DeleteOutlined,
   EditOutlined,
@@ -44,7 +44,10 @@ export const RolePanel = memo(function RolePanel({ controller }: PermissionPanel
   const [selectedMenuIds, setSelectedMenuIds] = useState<number[]>([])
   const [selectedApiPermissionIds, setSelectedApiPermissionIds] = useState<number[]>([])
   const [overwriteConfirmed, setOverwriteConfirmed] = useState(false)
+  const [grantLoading, setGrantLoading] = useState(false)
+  const [grantLoadError, setGrantLoadError] = useState<unknown>(null)
   const [grantSubmitting, setGrantSubmitting] = useState(false)
+  const grantRequestIdRef = useRef(0)
   const { message } = App.useApp()
   const { hasAuthority } = useAuth()
   const {
@@ -55,6 +58,7 @@ export const RolePanel = memo(function RolePanel({ controller }: PermissionPanel
     createRole,
     updateRole,
     deleteRole,
+    getRolePermissions,
     assignRolePermissions,
   } = controller
 
@@ -112,24 +116,48 @@ export const RolePanel = memo(function RolePanel({ controller }: PermissionPanel
     }
   }
 
-  const openGrantModal = (role: Role) => {
+  const openGrantModal = async (role: Role) => {
+    const requestId = grantRequestIdRef.current + 1
+    grantRequestIdRef.current = requestId
     setGrantTarget(role)
     setSelectedMenuIds([])
     setSelectedApiPermissionIds([])
     setOverwriteConfirmed(false)
+    setGrantLoading(true)
+    setGrantLoadError(null)
     setGrantModalOpen(true)
+
+    try {
+      const currentGrant = await getRolePermissions(role.id)
+      if (grantRequestIdRef.current !== requestId) {
+        return
+      }
+      setSelectedMenuIds(currentGrant.menuIds)
+      setSelectedApiPermissionIds(currentGrant.apiPermissionIds)
+    } catch (requestError) {
+      if (grantRequestIdRef.current === requestId) {
+        setGrantLoadError(requestError)
+      }
+    } finally {
+      if (grantRequestIdRef.current === requestId) {
+        setGrantLoading(false)
+      }
+    }
   }
 
   const closeGrantModal = () => {
+    grantRequestIdRef.current += 1
     setGrantModalOpen(false)
     setGrantTarget(null)
     setSelectedMenuIds([])
     setSelectedApiPermissionIds([])
     setOverwriteConfirmed(false)
+    setGrantLoading(false)
+    setGrantLoadError(null)
   }
 
   const handleGrant = async () => {
-    if (!grantTarget || !overwriteConfirmed) {
+    if (!grantTarget || !overwriteConfirmed || grantLoading || grantLoadError) {
       return
     }
 
@@ -189,7 +217,7 @@ export const RolePanel = memo(function RolePanel({ controller }: PermissionPanel
             </Button>
           )}
           {canUpdate && (
-            <Button type="text" size="small" icon={<KeyOutlined />} onClick={() => openGrantModal(role)}>
+            <Button type="text" size="small" icon={<KeyOutlined />} onClick={() => void openGrantModal(role)}>
               授权
             </Button>
           )}
@@ -287,17 +315,26 @@ export const RolePanel = memo(function RolePanel({ controller }: PermissionPanel
         okText="覆盖保存"
         cancelText="取消"
         confirmLoading={grantSubmitting}
-        okButtonProps={{ disabled: !overwriteConfirmed }}
+        okButtonProps={{ disabled: grantLoading || Boolean(grantLoadError) || !overwriteConfirmed }}
         onOk={() => void handleGrant()}
         width={680}
       >
         <div className="permission-grant-form">
-          <Alert
-            type="warning"
-            showIcon
-            message="后端暂未提供角色现有授权查询接口"
-            description="下方选择不会预填已有权限；保存将以本次选择覆盖该角色的全部菜单和接口权限。"
-          />
+          {grantLoadError ? (
+            <Alert
+              type="error"
+              showIcon
+              message="角色当前授权加载失败"
+              description={getErrorMessage(grantLoadError, '请关闭弹窗后重试，当前不会覆盖已有权限')}
+            />
+          ) : (
+            <Alert
+              type="info"
+              showIcon
+              message={grantLoading ? '正在加载角色当前授权' : '已预填角色当前授权'}
+              description="覆盖保存会以本次最终选择替换该角色的全部菜单和接口权限。"
+            />
+          )}
           <div>
             <Typography.Text strong>菜单权限</Typography.Text>
             <Select
@@ -305,6 +342,8 @@ export const RolePanel = memo(function RolePanel({ controller }: PermissionPanel
               allowClear
               showSearch
               optionFilterProp="label"
+              loading={grantLoading}
+              disabled={grantLoading || Boolean(grantLoadError)}
               value={selectedMenuIds}
               onChange={setSelectedMenuIds}
               options={menus.map((menuItem) => ({
@@ -322,6 +361,8 @@ export const RolePanel = memo(function RolePanel({ controller }: PermissionPanel
               allowClear
               showSearch
               optionFilterProp="label"
+              loading={grantLoading}
+              disabled={grantLoading || Boolean(grantLoadError)}
               value={selectedApiPermissionIds}
               onChange={setSelectedApiPermissionIds}
               options={apiPermissions.map((permission) => ({
@@ -332,7 +373,11 @@ export const RolePanel = memo(function RolePanel({ controller }: PermissionPanel
               placeholder="选择允许调用的接口"
             />
           </div>
-          <Checkbox checked={overwriteConfirmed} onChange={(event) => setOverwriteConfirmed(event.target.checked)}>
+          <Checkbox
+            checked={overwriteConfirmed}
+            disabled={grantLoading || Boolean(grantLoadError)}
+            onChange={(event) => setOverwriteConfirmed(event.target.checked)}
+          >
             我已确认以当前选择覆盖该角色全部权限
           </Checkbox>
         </div>
