@@ -5,6 +5,8 @@ import { PermissionGate } from './components/permission/PermissionGate.tsx'
 import { LoginPage } from './views/auth/LoginPage.tsx'
 import { AttendancePage } from './views/attendance/AttendancePage.tsx'
 import { EmployeePage } from './views/employee/EmployeePage.tsx'
+import { ApplicationPage } from './views/flow/ApplicationPage.tsx'
+import { ApprovalPage } from './views/flow/ApprovalPage.tsx'
 import { DepartmentPage } from './views/organization/DepartmentPage.tsx'
 import { PositionPage } from './views/organization/PositionPage.tsx'
 import { PermissionPage } from './views/permission/PermissionPage.tsx'
@@ -12,18 +14,6 @@ import { ModulePlaceholder } from './views/shared/ModulePlaceholder.tsx'
 import { WorkbenchPage } from './views/workbench/WorkbenchPage.tsx'
 
 const moduleRoutes = [
-  {
-    path: 'flow/applications',
-    authority: 'GET:/api/flow/applications/**',
-    title: '我的申请',
-    description: '提交请假与加班申请，跟踪申请处理状态。',
-  },
-  {
-    path: 'flow/approvals',
-    authority: 'GET:/api/flow/tasks/**',
-    title: '审批中心',
-    description: '处理直属员工申请并查询已办记录。',
-  },
   {
     path: 'notices',
     authority: 'GET:/api/notices/**',
@@ -84,6 +74,22 @@ function App() {
             element={
               <PermissionGate authority="GET:/api/attendance/**" showDenied>
                 <AttendancePage />
+              </PermissionGate>
+            }
+          />
+          <Route
+            path="flow/applications"
+            element={
+              <PermissionGate authority="GET:/api/flow/applications/**" showDenied>
+                <ApplicationPage />
+              </PermissionGate>
+            }
+          />
+          <Route
+            path="flow/approvals"
+            element={
+              <PermissionGate authority="GET:/api/flow/tasks/**" showDenied>
+                <ApprovalPage />
               </PermissionGate>
             }
           />

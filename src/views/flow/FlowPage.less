@@ -1,0 +1,154 @@
+@import '../../styles/tokens.less';
+
+.flow-page {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+}
+
+.flow-stats {
+  margin-bottom: 18px;
+
+  .ant-card {
+    height: 100%;
+    border: 1px solid @color-slate-200;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px fade(@color-navy-900, 3%);
+  }
+
+  .ant-card-body {
+    padding: 20px 22px;
+  }
+
+  .ant-statistic-title {
+    color: @color-slate-500;
+    font-size: 11px;
+  }
+
+  .ant-statistic-content {
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 26px;
+  }
+
+  .ant-statistic-content-prefix {
+    margin-right: 9px;
+    color: @color-accent-700;
+    font-size: 17px;
+  }
+
+  .ant-statistic-content-suffix {
+    color: @color-slate-500;
+    font-family: @font-body;
+    font-size: 11px;
+  }
+}
+
+.flow-alert {
+  margin-bottom: 18px;
+  border-radius: 12px;
+}
+
+.flow-table-card.ant-card {
+  border: 1px solid @color-slate-200;
+  border-radius: 18px;
+  box-shadow: 0 12px 34px fade(@color-navy-900, 5%);
+
+  > .ant-card-body {
+    padding: 0;
+  }
+
+  .ant-table-wrapper {
+    padding: 0 22px 22px;
+  }
+
+  .ant-table-thead > tr > th {
+    background: @color-slate-50;
+    color: @color-slate-500;
+    font-size: 11px;
+  }
+
+  .ant-table-tbody > tr > td {
+    color: @color-slate-800;
+    font-size: 12px;
+  }
+}
+
+.flow-table-toolbar {
+  display: flex;
+  padding: 22px;
+  align-items: center;
+  justify-content: space-between;
+
+  h4.ant-typography {
+    margin: 0 0 3px;
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 17px;
+  }
+
+  .ant-typography-secondary {
+    font-size: 11px;
+  }
+}
+
+.flow-primary-cell,
+.flow-time-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  .ant-tag {
+    width: fit-content;
+    margin: 0;
+  }
+
+  .ant-typography-secondary {
+    font-size: 10px;
+  }
+}
+
+.flow-form-actions {
+  display: flex;
+  padding-top: 4px;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.flow-approve-button.ant-btn {
+  color: @color-accent-700;
+}
+
+.flow-approval-card.ant-card {
+  > .ant-card-body {
+    padding: 0 22px 22px;
+  }
+
+  .ant-tabs-nav {
+    margin-bottom: 0;
+  }
+
+  .ant-tabs-tab {
+    padding: 20px 4px;
+    font-size: 12px;
+  }
+
+  .ant-table-wrapper {
+    padding: 0;
+  }
+}
+
+.flow-comment-field {
+  margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+  .flow-table-card.ant-card .ant-table-wrapper,
+  .flow-approval-card.ant-card > .ant-card-body {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .flow-table-toolbar {
+    padding: 18px 14px;
+  }
+}
