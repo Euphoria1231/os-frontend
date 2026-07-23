@@ -3,18 +3,21 @@
 .attendance-page {
   width: min(1440px, 100%);
   margin: 0 auto;
+  container-name: attendance-page;
+  container-type: inline-size;
 }
 
 .attendance-clock-card {
   position: relative;
   display: grid;
-  min-height: 250px;
-  padding: 36px 40px;
+  min-height: 220px;
+  padding: 28px 32px;
   border: 1px solid fade(@color-navy-900, 7%);
   border-radius: 22px;
   align-items: center;
-  gap: 34px;
-  grid-template-columns: minmax(250px, 0.8fr) minmax(500px, 1.35fr) 148px;
+  column-gap: 30px;
+  grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.28fr);
+  row-gap: 12px;
   overflow: hidden;
   background:
     radial-gradient(circle at 82% 0, fade(@color-accent, 13%), transparent 34%),
@@ -53,7 +56,7 @@
     margin: 0 0 6px;
     color: @color-navy-900;
     font-family: @font-display;
-    font-size: clamp(38px, 5vw, 58px);
+    font-size: clamp(34px, 4.2vw, 50px);
     letter-spacing: -0.035em;
   }
 
@@ -65,6 +68,8 @@
 }
 
 .attendance-time-board {
+  grid-column: 2;
+  grid-row: 1 / span 2;
   overflow: hidden;
   border: 1px solid @color-slate-200;
   border-radius: 18px;
@@ -74,11 +79,11 @@
 
 .attendance-time-row {
   display: grid;
-  min-height: 98px;
-  padding: 16px 20px;
+  min-height: 78px;
+  padding: 12px 16px;
   align-items: center;
-  gap: 18px;
-  grid-template-columns: minmax(126px, 0.82fr) repeat(2, minmax(124px, 1fr));
+  gap: 12px;
+  grid-template-columns: minmax(116px, 0.78fr) repeat(2, minmax(104px, 1fr));
 
   &.attendance-time-row-schedule {
     border-bottom: 1px solid @color-slate-200;
@@ -93,12 +98,12 @@
 
   > span {
     display: grid;
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border-radius: 10px;
     background: fade(@color-accent, 12%);
     color: @color-accent-700;
-    font-size: 16px;
+    font-size: 14px;
     place-items: center;
   }
 
@@ -131,7 +136,7 @@
     margin: 4px 0 0;
     color: @color-navy-900;
     font-family: @font-display;
-    font-size: clamp(16px, 1.5vw, 20px);
+    font-size: clamp(15px, 1.35vw, 18px);
     white-space: nowrap;
   }
 }
@@ -140,11 +145,13 @@
   display: flex;
   align-items: stretch;
   flex-direction: column;
+  grid-column: 1;
+  grid-row: 2;
   gap: 8px;
   text-align: center;
 
   .ant-btn {
-    width: 148px;
+    width: 164px;
   }
 
   .ant-typography-secondary {
@@ -367,31 +374,23 @@
   }
 }
 
-@media (max-width: 1200px) {
+@container attendance-page (max-width: 1100px) {
   .attendance-clock-card {
-    grid-template-columns: minmax(230px, 0.8fr) minmax(460px, 1.2fr);
-  }
-
-  .attendance-clock-actions {
-    align-items: stretch;
-    flex-direction: row;
-    grid-column: 1 / -1;
-
-    .ant-btn {
-      width: auto;
-      flex: 1;
-    }
-
-    .ant-typography-secondary {
-      align-self: center;
-    }
+    grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.25fr);
   }
 }
 
-@media (max-width: 720px) {
+@container attendance-page (max-width: 720px) {
   .attendance-clock-card {
     padding: 30px 24px;
     grid-template-columns: 1fr;
+  }
+
+  .attendance-clock-copy,
+  .attendance-time-board,
+  .attendance-clock-actions {
+    grid-column: 1;
+    grid-row: auto;
   }
 
   .attendance-time-row {
@@ -410,7 +409,9 @@
       width: 100%;
     }
   }
+}
 
+@media (max-width: 720px) {
   .attendance-location-metrics {
     grid-template-columns: 1fr;
 

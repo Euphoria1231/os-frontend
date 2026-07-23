@@ -456,10 +456,10 @@ export const AttendancePage = memo(function AttendancePage() {
   const clockActionLabel = CLOCK_ACTION_LABELS[clockAction]
   const morningSchedule = clockConfig
     ? `${clockConfig.morningStartTime}–${clockConfig.morningEndTime}`
-    : '—'
+    : '09:00–12:00'
   const afternoonSchedule = clockConfig
     ? `${clockConfig.afternoonStartTime}–${clockConfig.afternoonEndTime}`
-    : '—'
+    : '14:00–17:00'
   const locationDescription = locationState.status === 'locating'
     ? '请保持页面开启，系统正在请求设备定位。'
     : locationState.status === 'inside' && locationState.distanceMeters !== null
