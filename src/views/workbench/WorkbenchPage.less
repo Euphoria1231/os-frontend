@@ -1,0 +1,269 @@
+@import '../../styles/tokens.less';
+
+.workbench-page {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+}
+
+.workbench-hero {
+  position: relative;
+  display: flex;
+  min-height: 250px;
+  padding: 44px 48px;
+  border-radius: 24px;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 12%, fade(@color-accent, 16%), transparent 28%),
+    linear-gradient(135deg, @color-navy-950, @color-navy-800);
+  box-shadow: 0 22px 56px fade(@color-navy-900, 14%);
+
+  &::after {
+    position: absolute;
+    top: -190px;
+    right: -80px;
+    width: 430px;
+    height: 430px;
+    border: 1px solid fade(@color-white, 9%);
+    border-radius: 50%;
+    content: '';
+  }
+
+  > div {
+    position: relative;
+    z-index: 1;
+  }
+
+  .ant-tag {
+    margin: 0 0 16px;
+    padding: 4px 10px;
+    background: fade(@color-accent, 14%);
+    color: @color-accent-200;
+    font-family: @font-display;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+  }
+
+  h1.ant-typography {
+    margin: 0 0 10px;
+    color: @color-white;
+    font-family: @font-display;
+    font-size: clamp(34px, 4vw, 50px);
+    letter-spacing: -0.035em;
+  }
+
+  p.ant-typography {
+    margin: 0;
+    color: fade(@color-white, 58%);
+    font-size: 15px;
+  }
+}
+
+.workbench-identity-card {
+  display: flex;
+  min-width: 220px;
+  padding: 18px;
+  border: 1px solid fade(@color-white, 12%);
+  border-radius: 16px;
+  align-items: center;
+  gap: 13px;
+  background: fade(@color-white, 7%);
+  backdrop-filter: blur(12px);
+
+  > span {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: fade(@color-accent, 18%);
+    color: @color-accent-200;
+    font-size: 18px;
+    place-items: center;
+  }
+
+  .ant-typography {
+    display: block;
+    color: fade(@color-white, 52%);
+    font-size: 11px;
+
+    &:last-child {
+      margin-top: 3px;
+      color: @color-white;
+      font-size: 13px;
+    }
+  }
+}
+
+.workbench-section {
+  margin-top: 34px;
+}
+
+.workbench-section-heading {
+  margin-bottom: 18px;
+
+  h3.ant-typography {
+    margin: 5px 0 0;
+    color: @color-navy-900;
+    font-family: @font-display;
+  }
+}
+
+.workbench-eyebrow {
+  color: @color-accent-700;
+  font-family: @font-display;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+.workbench-module-link {
+  display: block;
+  height: 100%;
+}
+
+.workbench-module-card.ant-card {
+  height: 100%;
+  border: 1px solid @color-slate-200;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px fade(@color-navy-900, 4%);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+
+  &:hover {
+    border-color: fade(@color-accent, 42%);
+    box-shadow: 0 18px 42px fade(@color-navy-900, 10%);
+    transform: translateY(-3px);
+
+    .workbench-module-arrow {
+      transform: translateX(3px);
+    }
+  }
+
+  h4.ant-typography {
+    margin: 0 0 7px;
+    color: @color-navy-900;
+    font-family: @font-display;
+  }
+
+  p.ant-typography {
+    min-height: 44px;
+    margin: 0;
+    color: @color-slate-500;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+}
+
+.workbench-module-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  font-size: 18px;
+  place-items: center;
+}
+
+.workbench-module-arrow {
+  color: #9ba8b2;
+  transition: transform 180ms ease;
+}
+
+.tone-navy .workbench-module-icon {
+  background: fade(@color-navy-900, 9%);
+  color: @color-navy-900;
+}
+
+.tone-teal .workbench-module-icon {
+  background: fade(@color-accent, 12%);
+  color: @color-accent-700;
+}
+
+.tone-amber .workbench-module-icon {
+  background: fade(#c9852b, 12%);
+  color: #a5681d;
+}
+
+.tone-blue .workbench-module-icon {
+  background: fade(#3278b7, 11%);
+  color: #2e6ea6;
+}
+
+.workbench-system-note {
+  display: flex;
+  margin-top: 28px;
+  padding: 28px 32px;
+  border: 1px solid @color-slate-200;
+  border-radius: 18px;
+  align-items: center;
+  justify-content: space-between;
+  background: @color-white;
+
+  h4.ant-typography {
+    margin: 5px 0 7px;
+    color: @color-navy-900;
+    font-family: @font-display;
+  }
+
+  p.ant-typography {
+    max-width: 700px;
+    margin: 0;
+    color: @color-slate-500;
+    font-size: 12px;
+  }
+}
+
+.workbench-system-path {
+  display: flex;
+  align-items: center;
+
+  span {
+    padding: 7px 10px;
+    border: 1px solid @color-slate-200;
+    border-radius: 8px;
+    color: @color-slate-500;
+    font-family: @font-display;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+
+  i {
+    width: 18px;
+    height: 1px;
+    background: @color-slate-200;
+  }
+}
+
+@media (max-width: 900px) {
+  .workbench-hero {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .workbench-system-note {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .workbench-hero {
+    padding: 32px 26px;
+  }
+
+  .workbench-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .workbench-system-path {
+    display: none;
+  }
+}

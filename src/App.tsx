@@ -1,86 +1,61 @@
-import { memo } from 'react'
-import { Badge, Card, Flex, Progress, Space, Tag, Typography } from 'antd'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx'
+import { AppLayout } from './components/layout/AppLayout.tsx'
+import { PermissionGate } from './components/permission/PermissionGate.tsx'
 import { LoginPage } from './views/auth/LoginPage.tsx'
-import './App.less'
+import { ModulePlaceholder } from './views/shared/ModulePlaceholder.tsx'
+import { WorkbenchPage } from './views/workbench/WorkbenchPage.tsx'
 
-const { Paragraph, Text, Title } = Typography
-
-const FoundationPage = memo(function FoundationPage() {
-  return (
-    <main className="foundation-page">
-      <header className="foundation-header">
-        <Flex align="center" gap={12}>
-          <span className="foundation-logo" aria-hidden="true">
-            OA
-          </span>
-          <div>
-            <Text className="foundation-brand">OA WORKSPACE</Text>
-            <Text className="foundation-brand-subtitle">企业办公协同平台</Text>
-          </div>
-        </Flex>
-        <Badge status="processing" text="基础框架运行中" />
-      </header>
-
-      <section className="foundation-content">
-        <div className="foundation-intro">
-          <Tag bordered={false} className="foundation-kicker">
-            ENTERPRISE FOUNDATION
-          </Tag>
-          <Title level={1}>让组织协作，从清晰的工作入口开始。</Title>
-          <Paragraph>
-            统一请求、主题系统与路由骨架已经接入。后续登录、组织权限、考勤、审批和公告模块将在同一设计体系下逐步完成。
-          </Paragraph>
-          <Space size={[8, 10]} wrap>
-            <Tag>Ant Design</Tag>
-            <Tag>React Context</Tag>
-            <Tag>TypeScript</Tag>
-            <Tag>Less</Tag>
-          </Space>
-        </div>
-
-        <Card className="foundation-card" bordered={false}>
-          <Flex vertical gap={24}>
-            <div>
-              <Text className="foundation-card-eyebrow">SYSTEM READINESS</Text>
-              <Title level={3}>前端基础设施</Title>
-              <Paragraph>保持依赖克制，让业务页面拥有一致、稳定、可维护的底座。</Paragraph>
-            </div>
-
-            <div className="foundation-progress">
-              <Flex justify="space-between" align="center">
-                <Text strong>基础框架</Text>
-                <Text type="secondary">1 / 10</Text>
-              </Flex>
-              <Progress percent={10} showInfo={false} strokeColor="#1f8a70" />
-            </div>
-
-            <div className="foundation-capabilities">
-              <div>
-                <Text strong>中心 Request</Text>
-                <Text type="secondary">统一响应与错误边界</Text>
-              </div>
-              <div>
-                <Text strong>Router</Text>
-                <Text type="secondary">为权限路由预留入口</Text>
-              </div>
-              <div>
-                <Text strong>Design Tokens</Text>
-                <Text type="secondary">企业级主题与间距规范</Text>
-              </div>
-            </div>
-          </Flex>
-        </Card>
-      </section>
-
-      <footer className="foundation-footer">
-        <Text>OA Core · React + TypeScript</Text>
-        <Text>Gateway /api</Text>
-      </footer>
-    </main>
-  )
-})
+const moduleRoutes = [
+  {
+    path: 'organization/departments',
+    authority: 'GET:/api/user/**',
+    title: '部门管理',
+    description: '维护组织层级、部门负责人和启停状态。',
+  },
+  {
+    path: 'organization/positions',
+    authority: 'GET:/api/user/**',
+    title: '岗位管理',
+    description: '维护岗位编码、岗位名称和岗位状态。',
+  },
+  {
+    path: 'employees',
+    authority: 'GET:/api/user/**',
+    title: '员工管理',
+    description: '管理员工基础资料、组织关系与角色分配。',
+  },
+  {
+    path: 'permissions',
+    authority: 'GET:/api/user/**',
+    title: '权限管理',
+    description: '配置角色、菜单和后端接口权限。',
+  },
+  {
+    path: 'attendance',
+    authority: 'GET:/api/attendance/**',
+    title: '考勤打卡',
+    description: '完成上下班打卡并查询个人出勤记录。',
+  },
+  {
+    path: 'flow/applications',
+    authority: 'GET:/api/flow/applications/**',
+    title: '我的申请',
+    description: '提交请假与加班申请，跟踪申请处理状态。',
+  },
+  {
+    path: 'flow/approvals',
+    authority: 'GET:/api/flow/tasks/**',
+    title: '审批中心',
+    description: '处理直属员工申请并查询已办记录。',
+  },
+  {
+    path: 'notices',
+    authority: 'GET:/api/notices/**',
+    title: '公告通知',
+    description: '查看公司公告并维护个人已读状态。',
+  },
+]
 
 function App() {
   return (
@@ -88,14 +63,29 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route
-          path="/foundation"
+          path="/"
           element={
             <ProtectedRoute>
-              <FoundationPage />
+              <AppLayout />
             </ProtectedRoute>
           }
-        />
-        <Route path="*" element={<Navigate to="/foundation" replace />} />
+        >
+          <Route index element={<Navigate to="/workspace" replace />} />
+          <Route path="workspace" element={<WorkbenchPage />} />
+          {moduleRoutes.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={
+                <PermissionGate authority={route.authority} showDenied>
+                  <ModulePlaceholder title={route.title} description={route.description} />
+                </PermissionGate>
+              }
+            />
+          ))}
+          <Route path="foundation" element={<Navigate to="/workspace" replace />} />
+          <Route path="*" element={<Navigate to="/workspace" replace />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )

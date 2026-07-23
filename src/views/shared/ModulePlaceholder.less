@@ -1,0 +1,51 @@
+@import '../../styles/tokens.less';
+
+.module-placeholder {
+  display: grid;
+  min-height: calc(100vh - 124px);
+  place-items: center;
+
+  .ant-card {
+    width: min(620px, 100%);
+    border: 1px solid @color-slate-200;
+    background: @color-white;
+    text-align: center;
+  }
+
+  .ant-card-body {
+    padding: 56px 42px;
+  }
+
+  .ant-tag {
+    margin: 0;
+    background: fade(@color-accent, 10%);
+    color: @color-accent-700;
+    font-family: @font-display;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+  }
+
+  h2.ant-typography {
+    margin: 0;
+    color: @color-navy-900;
+    font-family: @font-display;
+  }
+
+  p.ant-typography {
+    max-width: 440px;
+    margin: 0;
+    color: @color-slate-500;
+  }
+}
+
+.module-placeholder-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: @color-navy-900;
+  color: @color-white;
+  font-size: 23px;
+  place-items: center;
+}

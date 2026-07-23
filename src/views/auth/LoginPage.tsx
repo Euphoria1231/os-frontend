@@ -32,7 +32,7 @@ export const LoginPage = memo(function LoginPage() {
   const { isAuthenticated, login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const destination = (location.state as LoginLocationState | null)?.from ?? '/foundation'
+  const destination = (location.state as LoginLocationState | null)?.from ?? '/workspace'
 
   if (isAuthenticated) {
     return <Navigate to={destination} replace />
