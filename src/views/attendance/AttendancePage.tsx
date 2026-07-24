@@ -120,7 +120,7 @@ async function getMakeupQuotaOrNull(quotaMonth: string): Promise<MakeupQuota | n
 
 export const AttendancePage = memo(function AttendancePage() {
   const [makeupForm] = Form.useForm<MakeupFormValues>()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const [now, setNow] = useState(() => new Date())
   const [range, setRange] = useState<[Dayjs, Dayjs]>(() => [
     dayjs().startOf('month'),

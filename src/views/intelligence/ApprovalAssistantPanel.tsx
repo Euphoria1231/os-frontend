@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  FileDoneOutlined,
   ReloadOutlined,
   RobotOutlined,
 } from '@ant-design/icons'

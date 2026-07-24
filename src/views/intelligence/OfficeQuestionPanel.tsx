@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import {
-  BookOutlined,
   ClearOutlined,
   MessageOutlined,
   RobotOutlined,

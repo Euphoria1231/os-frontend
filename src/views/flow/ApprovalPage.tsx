@@ -48,7 +48,7 @@ function getCurrentTask(application: FlowApplication) {
 
 export const ApprovalPage = memo(function ApprovalPage() {
   const [form] = Form.useForm<ApprovalRequest>()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const [processTarget, setProcessTarget] = useState<FlowApplication | null>(null)
   const [processAction, setProcessAction] = useState<ProcessAction>('approve')
   const [modalOpen, setModalOpen] = useState(false)
@@ -70,12 +70,6 @@ export const ApprovalPage = memo(function ApprovalPage() {
   const visibleDone = focusedApplicationId
     ? done.filter((task) => task.applicationId === focusedApplicationId)
     : done
-
-  const clearApplicationFocus = () => {
-    const nextSearchParams = new URLSearchParams(searchParams)
-    nextSearchParams.delete('applicationId')
-    setSearchParams(nextSearchParams, { replace: true })
-  }
 
   const openProcessModal = (application: FlowApplication, action: ProcessAction) => {
     setProcessTarget(application)
