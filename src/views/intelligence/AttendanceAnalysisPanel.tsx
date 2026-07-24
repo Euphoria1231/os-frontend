@@ -55,10 +55,6 @@ export function AttendanceAnalysisPanel() {
     <div className="intelligence-workspace">
       <div className="intelligence-control-column">
         <Card bordered={false} className="intelligence-control-card">
-          <div className="intelligence-card-kicker">
-            <LineChartOutlined />
-            ATTENDANCE INSIGHT
-          </div>
           <Typography.Title level={3}>配置分析周期</Typography.Title>
           <Typography.Paragraph type="secondary">
             依据考勤服务返回的明确状态统计异常频次，并生成个人改进建议。
@@ -115,14 +111,7 @@ export function AttendanceAnalysisPanel() {
           </div>
         </Card>
 
-        <Alert
-          className="intelligence-boundary-note"
-          type="info"
-          showIcon
-          icon={<CalendarOutlined />}
-          message="仅分析本人月度记录"
-          description="普通员工与部门主管均只分析自己的考勤；异常判定以考勤服务原始记录为准。"
-        />
+        
       </div>
 
       <div className="intelligence-output-column">

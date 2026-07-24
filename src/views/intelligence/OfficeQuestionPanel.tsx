@@ -56,18 +56,7 @@ export function OfficeQuestionPanel() {
     <div className="intelligence-workspace">
       <div className="intelligence-control-column">
         <Card bordered={false} className="intelligence-control-card intelligence-question-card">
-          <div className="intelligence-card-kicker">
-            <MessageOutlined />
-            OFFICE Q&amp;A
-          </div>
           <Typography.Title level={3}>向办公助手提问</Typography.Title>
-          <Typography.Paragraph type="secondary">
-            可咨询考勤规则、申请流程和日常办公制度。问题将通过 Gateway 安全发送至后端 AI Provider。
-          </Typography.Paragraph>
-
-          <label className="intelligence-field-label" htmlFor="office-question-input">
-            你的问题
-          </label>
           <textarea
             id="office-question-input"
             className={`intelligence-question-input${validationError ? ' has-error' : ''}`}
@@ -136,14 +125,6 @@ export function OfficeQuestionPanel() {
           </Space>
         </Card>
 
-        <Alert
-          className="intelligence-boundary-note"
-          type="info"
-          showIcon
-          icon={<BookOutlined />}
-          message="制度解释以正式文件为准"
-          description="AI 可帮助快速理解规则，但涉及审批、薪酬或人事决定时，请向主管或综合管理部确认。"
-        />
       </div>
 
       <div className="intelligence-output-column">

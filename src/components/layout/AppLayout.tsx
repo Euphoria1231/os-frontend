@@ -25,6 +25,7 @@ import { useAuth } from '../../hooks/auth/useAuth.ts'
 import { usePersonalNotificationSummary } from '../../hooks/notice/usePersonalNotificationSummary.ts'
 import { GlobalSearch } from '../search/GlobalSearch.tsx'
 import { buildNavigationItems, getNavigationTrail } from './navigation.tsx'
+import { shouldShowWorkspaceUtilityRail } from './WorkspaceUtilityRail.logic.ts'
 import { WorkspaceUtilityRailContainer } from './WorkspaceUtilityRail.tsx'
 import './AppLayout.less'
 
@@ -178,7 +179,9 @@ export const AppLayout = memo(function AppLayout() {
           <Content className="app-content">
             <Outlet />
           </Content>
-          {location.pathname !== '/workspace' && <WorkspaceUtilityRailContainer />}
+          {shouldShowWorkspaceUtilityRail(location.pathname) && (
+            <WorkspaceUtilityRailContainer />
+          )}
         </div>
       </Layout>
     </Layout>

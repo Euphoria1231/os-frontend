@@ -100,10 +100,7 @@ export function ApprovalAssistantPanel() {
     <div className="intelligence-workspace">
       <div className="intelligence-control-column">
         <Card bordered={false} className="intelligence-control-card">
-          <div className="intelligence-card-kicker">
-            <FileDoneOutlined />
-            APPLICATION REVIEW
-          </div>
+
           <Typography.Title level={3}>选择业务单据</Typography.Title>
           <Typography.Paragraph type="secondary">
             分析范围仅包含你有权查看的请假、加班申请，不读取补签单据。
