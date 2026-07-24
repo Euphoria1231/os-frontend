@@ -4,10 +4,9 @@ import {
   RobotOutlined,
 } from '@ant-design/icons'
 import { Alert, App, Button, Card, Empty, Select, Space, Tag, Typography } from 'antd'
-import { useAuth } from '../../hooks/auth/useAuth.ts'
 import { flowService } from '../../services/flow/flow.service.ts'
 import type { FlowApplication } from '../../services/flow/flow.types.ts'
-import { mergeApprovalCandidates } from '../../services/intelligence/intelligence.logic.ts'
+import { getApprovalCandidates } from '../../services/intelligence/intelligence.logic.ts'
 import { intelligenceService } from '../../services/intelligence/intelligence.service.ts'
 import type { ApprovalAnalysisResponse } from '../../services/intelligence/intelligence.types.ts'
 import { getErrorMessage } from '../../utils/error.ts'
@@ -35,19 +34,16 @@ export function ApprovalAssistantPanel() {
   const [analysisError, setAnalysisError] = useState<unknown>(null)
   const [analysis, setAnalysis] = useState<ApprovalAnalysisResponse | null>(null)
   const { message } = App.useApp()
-  const { hasAuthority } = useAuth()
-  const canReadTodo = hasAuthority('GET:/api/flow/tasks/**')
 
   useEffect(() => {
     let active = true
 
-    const todoRequest = canReadTodo ? flowService.listTodo() : Promise.resolve([])
-    Promise.all([flowService.listMyApplications(), todoRequest])
-      .then(([myApplications, todoApplications]) => {
+    flowService.listTodo()
+      .then((todoApplications) => {
         if (!active) {
           return
         }
-        const candidates = mergeApprovalCandidates(myApplications, todoApplications)
+        const candidates = getApprovalCandidates(todoApplications)
         setApplications(candidates)
         setApplicationsError(null)
         setSelectedApplicationId((current) => (
@@ -70,7 +66,7 @@ export function ApprovalAssistantPanel() {
     return () => {
       active = false
     }
-  }, [canReadTodo, reloadKey])
+  }, [reloadKey])
 
   const selectedApplication = useMemo(
     () => applications.find((application) => application.id === selectedApplicationId) ?? null,
@@ -102,7 +98,7 @@ export function ApprovalAssistantPanel() {
 
           <Typography.Title level={3}>选择业务单据</Typography.Title>
           <Typography.Paragraph type="secondary">
-            分析范围仅包含你有权查看的请假、加班申请，不读取补签单据。
+            仅展示直属下属的请假、加班待办，不读取本人申请或补签单据。
           </Typography.Paragraph>
 
           {Boolean(applicationsError) && (
@@ -131,7 +127,9 @@ export function ApprovalAssistantPanel() {
               label: `${application.applicationNo} · ${APPLICATION_TYPE_LABELS[application.applicationType]}`,
               title: application.reason,
             }))}
-            notFoundContent={loadingApplications ? null : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无可分析申请" />}
+            notFoundContent={loadingApplications ? null : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无直属下属待审批申请" />
+            )}
             onChange={setSelectedApplicationId}
           />
 

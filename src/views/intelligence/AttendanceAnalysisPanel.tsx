@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   LineChartOutlined,
+  ReloadOutlined,
   RobotOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { Alert, App, Button, Card, DatePicker, Tag, Typography } from 'antd'
+import { Alert, App, Button, Card, DatePicker, Empty, Select, Tag, Typography } from 'antd'
 import dayjs, { type Dayjs } from 'dayjs'
-import { useAuth } from '../../hooks/auth/useAuth.ts'
+import { useEmployees } from '../../hooks/employee/useEmployees.ts'
 import { intelligenceService } from '../../services/intelligence/intelligence.service.ts'
 import type { AttendanceAnalysisResponse } from '../../services/intelligence/intelligence.types.ts'
 import { getErrorMessage } from '../../utils/error.ts'
@@ -26,22 +27,43 @@ const RISK_LEVEL_COLORS: Record<string, string> = {
 
 export function AttendanceAnalysisPanel() {
   const [month, setMonth] = useState<Dayjs>(() => dayjs().startOf('month'))
+  const [preferredEmployeeId, setPreferredEmployeeId] = useState<number | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
   const [analysisError, setAnalysisError] = useState<unknown>(null)
   const [analysis, setAnalysis] = useState<AttendanceAnalysisResponse | null>(null)
   const { message } = App.useApp()
-  const { user } = useAuth()
+  const {
+    employees: directReports,
+    loading: loadingDirectReports,
+    error: directReportsError,
+    reload: reloadDirectReports,
+  } = useEmployees('direct-reports')
+
+  const selectedEmployeeId = useMemo(() => (
+    preferredEmployeeId !== null
+      && directReports.some((employee) => employee.id === preferredEmployeeId)
+      ? preferredEmployeeId
+      : directReports[0]?.id ?? null
+  ), [directReports, preferredEmployeeId])
+
+  const selectedEmployee = useMemo(
+    () => directReports.find((employee) => employee.id === selectedEmployeeId) ?? null,
+    [directReports, selectedEmployeeId],
+  )
 
   const analyzeAttendance = async () => {
-    if (!user?.id) {
-      message.error('当前登录员工信息不完整，无法发起考勤分析')
+    if (selectedEmployeeId === null) {
+      message.warning('请先选择需要分析的直属员工')
       return
     }
 
     setAnalyzing(true)
     setAnalysisError(null)
     try {
-      setAnalysis(await intelligenceService.analyzeAttendance(user.id, month.format('YYYY-MM')))
+      setAnalysis(await intelligenceService.analyzeAttendance(
+        selectedEmployeeId,
+        month.format('YYYY-MM'),
+      ))
       message.success('月度考勤分析已生成')
     } catch (error) {
       setAnalysisError(error)
@@ -56,17 +78,74 @@ export function AttendanceAnalysisPanel() {
         <Card bordered={false} className="intelligence-control-card">
           <Typography.Title level={3}>配置分析周期</Typography.Title>
           <Typography.Paragraph type="secondary">
-            依据考勤服务返回的明确状态统计异常频次，并生成个人改进建议。
+            选择直属员工，依据考勤服务返回的明确状态统计异常频次并生成改进建议。
           </Typography.Paragraph>
 
           <div className="intelligence-identity-card">
             <span><UserOutlined /></span>
             <div>
               <small>当前分析员工</small>
-              <strong>{user?.realName ?? '当前员工'}</strong>
-              <em>{user?.employeeNo ?? '员工编号未加载'}</em>
+              <strong>{selectedEmployee?.realName ?? '尚未选择直属员工'}</strong>
+              <em>{selectedEmployee?.employeeNo ?? '员工编号未加载'}</em>
             </div>
           </div>
+
+          {Boolean(directReportsError) && (
+            <Alert
+              className="intelligence-inline-alert"
+              type="warning"
+              showIcon
+              message="直属员工加载失败"
+              description={getErrorMessage(directReportsError, '请稍后重试')}
+              action={(
+                <Button
+                  size="small"
+                  icon={<ReloadOutlined />}
+                  loading={loadingDirectReports}
+                  onClick={() => {
+                    setAnalysis(null)
+                    setAnalysisError(null)
+                    void reloadDirectReports()
+                  }}
+                >
+                  重新加载
+                </Button>
+              )}
+            />
+          )}
+
+          <label className="intelligence-field-label" htmlFor="attendance-analysis-employee">
+            直属员工
+          </label>
+          <Select<number>
+            id="attendance-analysis-employee"
+            className="intelligence-wide-control"
+            size="large"
+            showSearch
+            optionFilterProp="label"
+            loading={loadingDirectReports}
+            value={selectedEmployeeId ?? undefined}
+            placeholder="选择直属员工"
+            options={directReports.map((employee) => ({
+              value: employee.id,
+              label: `${employee.realName} · ${employee.employeeNo}`,
+            }))}
+            notFoundContent={loadingDirectReports ? null : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无直属下属" />
+            )}
+            onChange={(employeeId) => {
+              setPreferredEmployeeId(employeeId)
+              setAnalysis(null)
+              setAnalysisError(null)
+            }}
+          />
+
+          {!loadingDirectReports && !directReportsError && directReports.length === 0 && (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="暂无直属下属，当前无法发起考勤分析"
+            />
+          )}
 
           <label className="intelligence-field-label" htmlFor="attendance-analysis-month">
             考勤月份
@@ -82,6 +161,8 @@ export function AttendanceAnalysisPanel() {
             onChange={(value) => {
               if (value) {
                 setMonth(value.startOf('month'))
+                setAnalysis(null)
+                setAnalysisError(null)
               }
             }}
           />
@@ -102,15 +183,14 @@ export function AttendanceAnalysisPanel() {
               size="large"
               icon={<RobotOutlined />}
               loading={analyzing}
-              disabled={!user?.id}
+              disabled={selectedEmployeeId === null || loadingDirectReports}
               onClick={() => void analyzeAttendance()}
             >
-              分析本月考勤
+              生成考勤分析
             </Button>
           </div>
         </Card>
 
-        
       </div>
 
       <div className="intelligence-output-column">

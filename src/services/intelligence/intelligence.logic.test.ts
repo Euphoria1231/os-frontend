@@ -6,7 +6,7 @@ import type { FlowApplication } from '../flow/flow.types.ts'
 import {
   buildOfficeQuestionRequest,
   getAiStatusMeta,
-  mergeApprovalCandidates,
+  getApprovalCandidates,
   validateOfficeQuestion,
 } from './intelligence.logic.ts'
 
@@ -64,16 +64,11 @@ test('AI 调用状态提供明确且不同的展示语义', () => {
   })
 })
 
-test('审批分析候选合并我的申请和待办并按时间倒序去重', () => {
-  const duplicate = createApplication(2, '2026-07-22T12:00:00')
-  const candidates = mergeApprovalCandidates(
-    [
-      createApplication(1, '2026-07-21T12:00:00'),
-      duplicate,
-      createApplication(4, '2026-07-24T12:00:00', { applicationType: 'MAKEUP' }),
-    ],
-    [duplicate, createApplication(3, '2026-07-23T12:00:00', { applicationType: 'OVERTIME' })],
-  )
+test('审批分析候选只来自当前审批待办', () => {
+  const candidates = getApprovalCandidates([
+    createApplication(3, '2026-07-23T12:00:00', { applicationType: 'OVERTIME' }),
+    createApplication(4, '2026-07-24T12:00:00', { applicationType: 'MAKEUP' }),
+  ])
 
-  assert.deepEqual(candidates.map((application) => application.id), [3, 2, 1])
+  assert.deepEqual(candidates.map((application) => application.id), [3])
 })
