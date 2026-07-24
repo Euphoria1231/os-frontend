@@ -143,9 +143,6 @@ export const OperationLogPage = memo(function OperationLogPage() {
       render: (_, record) => (
         <div className="operation-log-operator">
           <Typography.Text strong><UserOutlined /> {record.operatorName}</Typography.Text>
-          <Typography.Text type="secondary">
-            {record.operatorId ? `员工 ID · ${record.operatorId}` : '未识别员工身份'}
-          </Typography.Text>
         </div>
       ),
     },
@@ -155,10 +152,7 @@ export const OperationLogPage = memo(function OperationLogPage() {
       width: 178,
       render: (_, record) => (
         <div className="operation-log-operation">
-          <Tag bordered={false}>{MODULE_LABELS[record.businessModule] ?? record.businessModule}</Tag>
-          <Typography.Text strong>
-            {OPERATION_LABELS[record.operationType] ?? record.operationType}
-          </Typography.Text>
+          <Tag bordered={false} style={{fontSize: 14}}>{MODULE_LABELS[record.businessModule] ?? record.businessModule}</Tag>
         </div>
       ),
     },
@@ -169,16 +163,7 @@ export const OperationLogPage = memo(function OperationLogPage() {
       render: (_, record) => (
         <div className="operation-log-summary">
           <Typography.Text>{record.summary || '未提供操作摘要'}</Typography.Text>
-          <Typography.Text type="secondary">
-            {record.targetType
-              ? `${record.targetType}${record.targetId ? ` · ${record.targetId}` : ''}`
-              : '无关联业务对象'}
-          </Typography.Text>
-          {record.errorMessage && (
-            <Typography.Text type="danger" ellipsis={{ tooltip: record.errorMessage }}>
-              {record.errorMessage}
-            </Typography.Text>
-          )}
+          
         </div>
       ),
     },

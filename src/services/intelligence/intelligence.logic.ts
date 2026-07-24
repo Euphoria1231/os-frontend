@@ -7,6 +7,12 @@ import type { FlowApplication } from '../flow/flow.types.ts'
 
 const QUESTION_MAX_LENGTH = 500
 
+const ATTENDANCE_RISK_LABELS: Record<string, string> = {
+  LOW: '低风险',
+  MEDIUM: '中风险',
+  HIGH: '高风险',
+}
+
 const STATUS_META: Record<AiCallStatus, AiStatusMeta> = {
   SUCCESS: {
     label: '分析完成',
@@ -43,6 +49,10 @@ export function buildOfficeQuestionRequest(question: string): OfficeQuestionRequ
 
 export function getAiStatusMeta(status: AiCallStatus): AiStatusMeta {
   return STATUS_META[status]
+}
+
+export function getAttendanceRiskLabel(riskLevel: string): string {
+  return ATTENDANCE_RISK_LABELS[riskLevel] ?? '未知风险'
 }
 
 export function getApprovalCandidates(todoApplications: FlowApplication[]): FlowApplication[] {

@@ -7,6 +7,7 @@ import {
   buildOfficeQuestionRequest,
   getAiStatusMeta,
   getApprovalCandidates,
+  getAttendanceRiskLabel,
   validateOfficeQuestion,
 } from './intelligence.logic.ts'
 
@@ -62,6 +63,13 @@ test('AI 调用状态提供明确且不同的展示语义', () => {
     color: 'error',
     description: '本次分析未生成有效结果，请稍后重试',
   })
+})
+
+test('考勤风险等级只显示中文标签', () => {
+  assert.equal(getAttendanceRiskLabel('LOW'), '低风险')
+  assert.equal(getAttendanceRiskLabel('MEDIUM'), '中风险')
+  assert.equal(getAttendanceRiskLabel('HIGH'), '高风险')
+  assert.equal(getAttendanceRiskLabel('UNKNOWN'), '未知风险')
 })
 
 test('审批分析候选只来自当前审批待办', () => {

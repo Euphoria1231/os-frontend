@@ -5,19 +5,14 @@ import {
   RobotOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { Alert, App, Button, Card, DatePicker, Empty, Select, Tag, Typography } from 'antd'
+import { Alert, App, Button, Card, DatePicker, Empty, Flex, Select, Tag, Typography } from 'antd'
 import dayjs, { type Dayjs } from 'dayjs'
 import { useEmployees } from '../../hooks/employee/useEmployees.ts'
+import { getAttendanceRiskLabel } from '../../services/intelligence/intelligence.logic.ts'
 import { intelligenceService } from '../../services/intelligence/intelligence.service.ts'
 import type { AttendanceAnalysisResponse } from '../../services/intelligence/intelligence.types.ts'
 import { getErrorMessage } from '../../utils/error.ts'
 import { AnalysisResultCard } from './AnalysisResultCard.tsx'
-
-const RISK_LEVEL_LABELS: Record<string, string> = {
-  LOW: '低风险',
-  MEDIUM: '中风险',
-  HIGH: '高风险',
-}
 
 const RISK_LEVEL_COLORS: Record<string, string> = {
   LOW: 'success',
@@ -205,10 +200,10 @@ export function AttendanceAnalysisPanel() {
             <section className="intelligence-risk-banner">
               <div>
                 <span>综合风险等级</span>
-                <strong>{RISK_LEVEL_LABELS[analysis.riskLevel] ?? analysis.riskLevel}</strong>
+                <strong>{getAttendanceRiskLabel(analysis.riskLevel)}</strong>
               </div>
               <Tag color={RISK_LEVEL_COLORS[analysis.riskLevel] ?? 'default'}>
-                {analysis.riskLevel}
+                {getAttendanceRiskLabel(analysis.riskLevel)}
               </Tag>
             </section>
             <section className="intelligence-result-section">
@@ -217,11 +212,11 @@ export function AttendanceAnalysisPanel() {
             </section>
             <section className="intelligence-result-section">
               <span>改进建议</span>
-              <ul className="intelligence-insight-list">
+              <Flex vertical gap={8}>
                 {analysis.improvementSuggestions.map((suggestion) => (
-                  <li key={suggestion}>{suggestion}</li>
+                  <Typography.Paragraph key={suggestion}>{suggestion}</Typography.Paragraph>
                 ))}
-              </ul>
+              </Flex>
             </section>
           </AnalysisResultCard>
         ) : (
