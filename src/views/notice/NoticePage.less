@@ -152,6 +152,19 @@
   gap: 10px;
 }
 
+.notice-detail-modal {
+  .ant-modal-content {
+    display: flex;
+    max-height: 75vh;
+    flex-direction: column;
+  }
+
+  .ant-modal-body {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
 .notice-detail {
   > .ant-tag {
     margin: 0 0 16px;
@@ -187,6 +200,12 @@
 }
 
 @media (max-width: 720px) {
+  .notice-detail-modal.ant-modal {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px);
+    margin: 0 auto;
+  }
+
   .notice-toolbar {
     align-items: stretch;
     flex-direction: column;

@@ -14,7 +14,6 @@ import {
   Button,
   Card,
   Col,
-  Drawer,
   Form,
   Input,
   List,
@@ -44,7 +43,7 @@ export const NoticePage = memo(function NoticePage() {
   const [keyword, setKeyword] = useState('')
   const [publishModalOpen, setPublishModalOpen] = useState(false)
   const [publishing, setPublishing] = useState(false)
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [detailModalOpen, setDetailModalOpen] = useState(false)
   const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const { message } = App.useApp()
@@ -66,7 +65,7 @@ export const NoticePage = memo(function NoticePage() {
     }
 
     let active = true
-    setDrawerOpen(true)
+    setDetailModalOpen(true)
     setDetailLoading(true)
     readNotice(focusedNoticeId, canMarkRead)
       .then((notice) => {
@@ -135,7 +134,7 @@ export const NoticePage = memo(function NoticePage() {
   }
 
   const closeNotice = () => {
-    setDrawerOpen(false)
+    setDetailModalOpen(false)
     setSelectedNotice(null)
     const nextSearchParams = new URLSearchParams(searchParams)
     nextSearchParams.delete('noticeId')
@@ -262,12 +261,16 @@ export const NoticePage = memo(function NoticePage() {
         </Form>
       </Modal>
 
-      <Drawer
+      <Modal
+        className="notice-detail-modal"
         title="公告详情"
-        open={drawerOpen}
-        onClose={closeNotice}
-        width={640}
+        open={detailModalOpen}
+        onCancel={closeNotice}
+        footer={null}
+        width={720}
+        centered
         loading={detailLoading}
+        destroyOnHidden
       >
         {selectedNotice && (
           <article className="notice-detail">
@@ -286,7 +289,7 @@ export const NoticePage = memo(function NoticePage() {
             )}
           </article>
         )}
-      </Drawer>
+      </Modal>
     </section>
   )
 })
