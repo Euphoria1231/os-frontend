@@ -320,21 +320,6 @@ export const RolePanel = memo(function RolePanel({ controller }: PermissionPanel
         width={680}
       >
         <div className="permission-grant-form">
-          {grantLoadError ? (
-            <Alert
-              type="error"
-              showIcon
-              message="角色当前授权加载失败"
-              description={getErrorMessage(grantLoadError, '请关闭弹窗后重试，当前不会覆盖已有权限')}
-            />
-          ) : (
-            <Alert
-              type="info"
-              showIcon
-              message={grantLoading ? '正在加载角色当前授权' : '已预填角色当前授权'}
-              description="覆盖保存会以本次最终选择替换该角色的全部菜单和接口权限。"
-            />
-          )}
           <div>
             <Typography.Text strong>菜单权限</Typography.Text>
             <Select

@@ -314,23 +314,6 @@ export const ApprovalPage = memo(function ApprovalPage() {
         />
       )}
 
-      {focusedApplicationId && (
-        <Alert
-          className="flow-alert"
-          type={visibleTodo.length > 0 || visibleDone.length > 0 || loading ? 'info' : 'warning'}
-          showIcon
-          message={
-            loading
-              ? `正在定位申请 #${focusedApplicationId}`
-              : visibleTodo.length > 0 || visibleDone.length > 0
-                ? `当前仅显示申请 #${focusedApplicationId} 的审批任务`
-                : `未找到申请 #${focusedApplicationId} 的审批任务`
-          }
-          description="该筛选来自个人通知跳转；任务处理后可能从待办移动到已办。"
-          action={<Button size="small" onClick={clearApplicationFocus}>显示全部</Button>}
-        />
-      )}
-
       <Card bordered={false} className="flow-table-card flow-approval-card">
         <Tabs
           items={[

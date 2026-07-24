@@ -689,13 +689,7 @@ export const EmployeePage = memo(function EmployeePage() {
         footer={null}
         width={560}
       >
-        <Alert
-          className="employee-quota-alert"
-          type="info"
-          showIcon
-          message="额度按月配置"
-          description="仅直属领导可以为该员工配置额度；重复配置同一月份会更新总次数，默认填写 5 次。"
-        />
+
         <Form<MakeupQuotaFormValues>
           form={makeupQuotaForm}
           layout="vertical"

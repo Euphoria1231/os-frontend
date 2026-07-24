@@ -246,12 +246,6 @@ export const GlobalSearch = memo(function GlobalSearch() {
               })
             )}
           </div>
-
-          <footer className="global-search-footer">
-            <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
-            <span><kbd>Enter</kbd> 打开</span>
-            <span><kbd>Esc</kbd> 关闭</span>
-          </footer>
         </section>
       )}
     </div>

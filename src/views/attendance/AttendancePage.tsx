@@ -179,12 +179,6 @@ export const AttendancePage = memo(function AttendancePage() {
     ? records.filter((record) => record.id === focusedRecordId)
     : records
 
-  const clearRecordFocus = () => {
-    const nextSearchParams = new URLSearchParams(searchParams)
-    nextSearchParams.delete('recordId')
-    setSearchParams(nextSearchParams, { replace: true })
-  }
-
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000)
     return () => window.clearInterval(timer)
@@ -566,9 +560,7 @@ export const AttendancePage = memo(function AttendancePage() {
             >
               {clockAction === 'COMPLETED' ? '今日已完成' : '考勤打卡'}
             </Button>
-            <Typography.Text type="secondary">
-              {clockAction === 'COMPLETED' ? '无需重复操作' : '需验证当前位置'}
-            </Typography.Text>
+            
           </div>
         )}
       </section>
@@ -618,23 +610,6 @@ export const AttendancePage = memo(function AttendancePage() {
           message="部分考勤或补签数据暂时无法加载"
           description={getErrorMessage(pageError, '请稍后重试')}
           action={<Button size="small" icon={<ReloadOutlined />} onClick={() => void handleReload()}>重新加载</Button>}
-        />
-      )}
-
-      {focusedRecordId && (
-        <Alert
-          className="attendance-alert"
-          type={visibleRecords.length > 0 || loading ? 'info' : 'warning'}
-          showIcon
-          message={
-            loading
-              ? `正在定位考勤记录 #${focusedRecordId}`
-              : visibleRecords.length > 0
-                ? `当前仅显示考勤记录 #${focusedRecordId}`
-                : `当前日期范围内未找到考勤记录 #${focusedRecordId}`
-          }
-          description="该筛选来自个人通知跳转；可以调整日期范围后重新查询。"
-          action={<Button size="small" onClick={clearRecordFocus}>显示全部</Button>}
         />
       )}
 
@@ -733,13 +708,7 @@ export const AttendancePage = memo(function AttendancePage() {
           </div>
         </div>
 
-        <Alert
-          className="attendance-location-alert"
-          type={locationState.status === 'inside' ? 'success' : 'info'}
-          showIcon
-          message="位置由浏览器获取，服务端将在提交时再次校验"
-          description="定位功能需要在 HTTPS 或 localhost 环境运行。"
-        />
+        
       </Modal>
 
       <Modal

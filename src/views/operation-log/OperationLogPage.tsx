@@ -214,30 +214,15 @@ export const OperationLogPage = memo(function OperationLogPage() {
   return (
     <section className="operation-log-page">
       <PageHeader
-        eyebrow="AUDIT TRAIL"
+        eyebrow=""
         title="业务操作日志"
         description={
-          isSuperAdmin
-            ? '查看全员关键业务操作，按人员、模块、结果和时间快速定位记录。'
-            : '查看本人产生的关键业务操作与处理结果。'
+          ""
         }
         extra={
           <Button icon={<ReloadOutlined />} loading={loading} onClick={reload}>
             刷新记录
           </Button>
-        }
-      />
-
-      <Alert
-        className="operation-log-scope-alert"
-        type={isSuperAdmin ? 'info' : 'success'}
-        showIcon
-        icon={isSuperAdmin ? <FileSearchOutlined /> : <UserOutlined />}
-        message={isSuperAdmin ? '当前为管理员全量视图' : '当前仅展示本人操作记录'}
-        description={
-          isSuperAdmin
-            ? '操作人筛选支持员工姓名和员工 ID；查询范围由后端角色校验。'
-            : '数据范围由当前登录身份确定，不能切换或指定其他员工。'
         }
       />
 
