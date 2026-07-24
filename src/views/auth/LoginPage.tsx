@@ -15,7 +15,7 @@ import { RequestError } from '../../services/request.ts'
 import type { LoginRequest } from '../../services/auth/auth.types.ts'
 import './LoginPage.less'
 
-const { Paragraph, Text, Title } = Typography
+const { Text, Title } = Typography
 
 interface LoginLocationState {
   from?: string
@@ -121,9 +121,7 @@ export const LoginPage = memo(function LoginPage() {
       <section className="login-form-panel">
         <div className="login-form-wrapper">
           <Space direction="vertical" size={8} className="login-form-heading">
-            <Text className="login-form-eyebrow">EMPLOYEE ACCESS</Text>
             <Title level={2}>欢迎登录</Title>
-            <Paragraph>使用员工账号进入企业办公平台</Paragraph>
           </Space>
 
           <Form<LoginRequest>

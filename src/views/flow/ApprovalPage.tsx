@@ -279,9 +279,8 @@ export const ApprovalPage = memo(function ApprovalPage() {
   return (
     <section className="flow-page">
       <PageHeader
-        eyebrow="WORKFLOW / APPROVALS"
         title="审批中心"
-        description="处理当前分配给我的请假、加班与补签审批任务，并查看个人已办记录。"
+        description=""
         extra={<Button icon={<ReloadOutlined />} loading={loading} onClick={() => void reload()}>刷新任务</Button>}
       />
 

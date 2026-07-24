@@ -688,9 +688,6 @@ export const EmployeePage = memo(function EmployeePage() {
         onOk={() => void handleAssignRoles()}
       >
         <div className="employee-role-panel">
-          <Typography.Paragraph type="secondary">
-            角色决定员工可见菜单与可调用接口；保存后重新登录即可获取最新 JWT 权限。
-          </Typography.Paragraph>
           <Select
             mode="multiple"
             allowClear

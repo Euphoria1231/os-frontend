@@ -115,9 +115,8 @@ export const PersonalNotificationPage = memo(function PersonalNotificationPage()
   return (
     <section className="personal-notification-page">
       <PageHeader
-        eyebrow="INBOX / PERSONAL"
         title="个人通知"
-        description="集中查看审批流转与考勤异常提醒，通知数据仅对本人可见。"
+        description=""
         extra={
           <Button
             icon={<CheckOutlined />}
