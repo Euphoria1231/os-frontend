@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import {
   CalendarOutlined,
   CheckCircleOutlined,
@@ -46,6 +46,7 @@ import { getErrorMessage } from '../../utils/error.ts'
 import {
   calculateDistanceMeters,
   formatClockTime,
+  hasAttendanceDateChanged,
   isInsideGeofence,
   resolveClockAction,
   type ClockAction,
@@ -62,7 +63,7 @@ function formatTime(value: string | null): string {
   return value ? dayjs(value).format('HH:mm:ss') : '--:--:--'
 }
 
-function getWorkDuration(record: AttendanceRecord): string {
+function getClockInterval(record: AttendanceRecord): string {
   if (!record.clockInTime || !record.clockOutTime) {
     return '—'
   }
@@ -94,8 +95,9 @@ const INITIAL_LOCATION_STATE: ClockLocationState = {
 }
 
 const CLOCK_ACTION_LABELS: Record<ClockAction, string> = {
-  CLOCK_IN: '上班打卡',
-  CLOCK_OUT: '下班打卡',
+  MORNING_CLOCK: '上午打卡',
+  WAITING_AFTERNOON: '下午打卡尚未开始',
+  AFTERNOON_CLOCK: '下午打卡',
   COMPLETED: '今日打卡已完成',
 }
 
@@ -122,11 +124,12 @@ export const AttendancePage = memo(function AttendancePage() {
   const [makeupForm] = Form.useForm<MakeupFormValues>()
   const [searchParams] = useSearchParams()
   const [now, setNow] = useState(() => new Date())
+  const attendanceDateRef = useRef(dayjs().format('YYYY-MM-DD'))
   const [range, setRange] = useState<[Dayjs, Dayjs]>(() => [
     dayjs().startOf('month'),
     dayjs().endOf('month'),
   ])
-  const [submitting, setSubmitting] = useState<'in' | 'out' | null>(null)
+  const [submitting, setSubmitting] = useState<'morning' | 'afternoon' | null>(null)
   const [clockModalOpen, setClockModalOpen] = useState(false)
   const [locationState, setLocationState] = useState<ClockLocationState>(
     INITIAL_LOCATION_STATE,
@@ -167,7 +170,12 @@ export const AttendancePage = memo(function AttendancePage() {
     ? dayjs(makeupTarget.attendanceDate).format('YYYY-MM')
     : currentMonth
   const targetQuota = quotaByMonth[makeupTargetMonth]
-  const clockAction = resolveClockAction(today)
+  const afternoonClockStartTime = clockConfig?.afternoonClockStartTime ?? '13:30'
+  const clockAction = resolveClockAction(
+    today,
+    dayjs(now).format('HH:mm'),
+    afternoonClockStartTime,
+  )
   const recordIdParam = searchParams.get('recordId')
   const parsedRecordId = Number(recordIdParam)
   const focusedRecordId = recordIdParam !== null
@@ -180,9 +188,17 @@ export const AttendancePage = memo(function AttendancePage() {
     : records
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 1000)
+    const timer = window.setInterval(() => {
+      const nextNow = new Date()
+      const nextDate = dayjs(nextNow).format('YYYY-MM-DD')
+      if (hasAttendanceDateChanged(attendanceDateRef.current, nextDate)) {
+        attendanceDateRef.current = nextDate
+        void reload()
+      }
+      setNow(nextNow)
+    }, 1000)
     return () => window.clearInterval(timer)
-  }, [])
+  }, [reload])
 
   useEffect(() => {
     let active = true
@@ -294,26 +310,26 @@ export const AttendancePage = memo(function AttendancePage() {
 
   const handleClockSubmit = async () => {
     if (
-      clockAction === 'COMPLETED'
+      (clockAction !== 'MORNING_CLOCK' && clockAction !== 'AFTERNOON_CLOCK')
       || !locationState.point
       || locationState.status !== 'inside'
     ) return
 
-    const isClockIn = clockAction === 'CLOCK_IN'
-    setSubmitting(isClockIn ? 'in' : 'out')
+    const isMorningClock = clockAction === 'MORNING_CLOCK'
+    setSubmitting(isMorningClock ? 'morning' : 'afternoon')
     try {
-      const record = isClockIn
+      const record = isMorningClock
         ? await clockIn(locationState.point)
         : await clockOut(locationState.point)
-      const clockTime = isClockIn ? record.clockInTime : record.clockOutTime
+      const clockTime = isMorningClock ? record.clockInTime : record.clockOutTime
       message.success(
-        `${isClockIn ? '上班' : '下班'}打卡成功：${formatTime(clockTime)}`,
+        `${isMorningClock ? '上午' : '下午'}打卡成功：${formatTime(clockTime)}`,
       )
       setClockModalOpen(false)
       setLocationState(INITIAL_LOCATION_STATE)
     } catch (requestError) {
       message.error(
-        getErrorMessage(requestError, `${isClockIn ? '上班' : '下班'}打卡失败`),
+        getErrorMessage(requestError, `${isMorningClock ? '上午' : '下午'}打卡失败`),
       )
     } finally {
       setSubmitting(null)
@@ -393,21 +409,21 @@ export const AttendancePage = memo(function AttendancePage() {
       ),
     },
     {
-      title: '上班打卡',
+      title: '上午打卡',
       dataIndex: 'clockInTime',
       key: 'clockInTime',
       render: formatDateTime,
     },
     {
-      title: '下班打卡',
+      title: '下午打卡',
       dataIndex: 'clockOutTime',
       key: 'clockOutTime',
       render: formatDateTime,
     },
     {
-      title: '工作时长',
+      title: '两次打卡间隔',
       key: 'duration',
-      render: (_, record) => getWorkDuration(record),
+      render: (_, record) => getClockInterval(record),
     },
     {
       title: '考勤状态',
@@ -466,6 +482,24 @@ export const AttendancePage = memo(function AttendancePage() {
   const completedCount = records.filter((record) => record.clockInTime && record.clockOutTime).length
   const pageError = error ?? applicationsError ?? quotaError
   const clockActionLabel = CLOCK_ACTION_LABELS[clockAction]
+  const clockActionAvailable = clockAction === 'MORNING_CLOCK'
+    || clockAction === 'AFTERNOON_CLOCK'
+  const clockButtonLabel = clockAction === 'COMPLETED'
+    ? '今日已完成'
+    : clockAction === 'WAITING_AFTERNOON'
+      ? `下午打卡 ${afternoonClockStartTime} 开放`
+      : '考勤打卡'
+  const clockStatusDescription = clockAction === 'MORNING_CLOCK'
+    ? '上午尚未打卡。'
+    : clockAction === 'WAITING_AFTERNOON'
+      ? `上午打卡已完成，下午打卡将于 ${afternoonClockStartTime} 开放。`
+      : clockAction === 'AFTERNOON_CLOCK'
+        ? today?.clockInTime
+          ? '已切换到下午场次，请完成下午打卡。'
+          : '上午未打卡，当前仍可完成下午打卡。'
+        : today?.clockInTime
+          ? '今天的上午、下午打卡均已完成。'
+          : '下午打卡已完成，上午未打卡。'
   const morningSchedule = clockConfig
     ? `${clockConfig.morningStartTime}–${clockConfig.morningEndTime}`
     : '09:00–12:00'
@@ -498,12 +532,7 @@ export const AttendancePage = memo(function AttendancePage() {
           <Tag bordered={false}>TODAY · {dateLabel}</Tag>
           <Typography.Title>{dayjs(now).format('HH:mm:ss')}</Typography.Title>
           <Typography.Paragraph>
-            {user?.realName ?? '当前员工'}，
-            {!today?.clockInTime
-              ? '今天还没有开始考勤。'
-              : !today.clockOutTime
-                ? '上班打卡已完成，记得下班打卡。'
-                : '今天的上下班打卡均已完成。'}
+            {user?.realName ?? '当前员工'}，{clockStatusDescription}
           </Typography.Paragraph>
         </div>
 
@@ -534,13 +563,13 @@ export const AttendancePage = memo(function AttendancePage() {
               </div>
             </div>
             <div className="attendance-time-slot">
-              <Typography.Text>上班打卡</Typography.Text>
+              <Typography.Text>上午打卡</Typography.Text>
               <Typography.Title level={4}>
                 {formatClockTime(today?.clockInTime)}
               </Typography.Title>
             </div>
             <div className="attendance-time-slot">
-              <Typography.Text>下班打卡</Typography.Text>
+              <Typography.Text>下午打卡</Typography.Text>
               <Typography.Title level={4}>
                 {formatClockTime(today?.clockOutTime)}
               </Typography.Title>
@@ -554,11 +583,11 @@ export const AttendancePage = memo(function AttendancePage() {
               type="primary"
               size="large"
               icon={<EnvironmentOutlined />}
-              disabled={clockAction === 'COMPLETED' || !clockConfig}
+              disabled={!clockActionAvailable || !clockConfig}
               loading={Boolean(submitting)}
               onClick={openClockModal}
             >
-              {clockAction === 'COMPLETED' ? '今日已完成' : '考勤打卡'}
+              {clockButtonLabel}
             </Button>
             
           </div>
@@ -732,8 +761,13 @@ export const AttendancePage = memo(function AttendancePage() {
               },
               {
                 key: 'clockIn',
-                label: '上班打卡',
+                label: '上午打卡',
                 children: formatTime(makeupTarget?.clockInTime ?? null),
+              },
+              {
+                key: 'clockOut',
+                label: '下午打卡',
+                children: formatTime(makeupTarget?.clockOutTime ?? null),
               },
               {
                 key: 'record',

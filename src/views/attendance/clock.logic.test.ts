@@ -5,34 +5,87 @@ import test from 'node:test'
 import {
   calculateDistanceMeters,
   formatClockTime,
+  hasAttendanceDateChanged,
   isInsideGeofence,
   resolveClockAction,
 } from './clock.logic.ts'
 
 const center = { longitude: 119.411209, latitude: 26.022543 }
 
-test('尚未打卡时执行上班打卡', () => {
-  assert.equal(resolveClockAction(null), 'CLOCK_IN')
+test('13:30 前未打卡时执行上午打卡', () => {
+  assert.equal(resolveClockAction(null, '13:29', '13:30'), 'MORNING_CLOCK')
   assert.equal(
-    resolveClockAction({ clockInTime: null, clockOutTime: null }),
-    'CLOCK_IN',
+    resolveClockAction(
+      { clockInTime: null, clockOutTime: null },
+      '09:00',
+      '13:30',
+    ),
+    'MORNING_CLOCK',
   )
 })
 
-test('上班打卡后执行下班打卡且完整打卡后结束', () => {
+test('上午打卡完成后等待下午场次开放', () => {
   assert.equal(
-    resolveClockAction({
-      clockInTime: '2026-07-23T09:00:00',
-      clockOutTime: null,
-    }),
-    'CLOCK_OUT',
+    resolveClockAction(
+      {
+        clockInTime: '2026-07-23T09:00:00',
+        clockOutTime: null,
+      },
+      '13:29',
+      '13:30',
+    ),
+    'WAITING_AFTERNOON',
+  )
+})
+
+test('13:30 起切换下午场次且不依赖上午记录', () => {
+  assert.equal(resolveClockAction(null, '13:30', '13:30'), 'AFTERNOON_CLOCK')
+  assert.equal(
+    resolveClockAction(
+      {
+        clockInTime: '2026-07-23T09:00:00',
+        clockOutTime: null,
+      },
+      '15:03',
+      '13:30',
+    ),
+    'AFTERNOON_CLOCK',
+  )
+})
+
+test('下午打卡完成后结束当天打卡', () => {
+  assert.equal(
+    resolveClockAction(
+      {
+        clockInTime: null,
+        clockOutTime: '2026-07-23T14:00:00',
+      },
+      '14:00',
+      '13:30',
+    ),
+    'COMPLETED',
   )
   assert.equal(
-    resolveClockAction({
-      clockInTime: '2026-07-23T09:00:00',
-      clockOutTime: '2026-07-23T17:00:00',
-    }),
+    resolveClockAction(
+      {
+        clockInTime: '2026-07-23T09:00:00',
+        clockOutTime: '2026-07-23T14:00:00',
+      },
+      '14:00',
+      '13:30',
+    ),
     'COMPLETED',
+  )
+})
+
+test('跨零点时识别为新的考勤日期', () => {
+  assert.equal(
+    hasAttendanceDateChanged('2026-07-23', '2026-07-24'),
+    true,
+  )
+  assert.equal(
+    hasAttendanceDateChanged('2026-07-24', '2026-07-24'),
+    false,
   )
 })
 

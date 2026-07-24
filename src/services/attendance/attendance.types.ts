@@ -27,6 +27,7 @@ export interface AttendanceClockConfig {
   morningStartTime: string
   morningEndTime: string
   afternoonStartTime: string
+  afternoonClockStartTime: string
   afternoonEndTime: string
   centerLongitude: number
   centerLatitude: number

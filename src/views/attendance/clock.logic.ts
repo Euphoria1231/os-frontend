@@ -12,14 +12,28 @@ export interface ClockRecordState {
   clockOutTime: string | null
 }
 
-export type ClockAction = 'CLOCK_IN' | 'CLOCK_OUT' | 'COMPLETED'
+export type ClockAction =
+  | 'MORNING_CLOCK'
+  | 'WAITING_AFTERNOON'
+  | 'AFTERNOON_CLOCK'
+  | 'COMPLETED'
 
 export function resolveClockAction(
   today: ClockRecordState | null,
+  currentTime: string,
+  afternoonClockStartTime: string,
 ): ClockAction {
-  if (!today?.clockInTime) return 'CLOCK_IN'
-  if (!today.clockOutTime) return 'CLOCK_OUT'
-  return 'COMPLETED'
+  if (today?.clockOutTime) return 'COMPLETED'
+  if (currentTime >= afternoonClockStartTime) return 'AFTERNOON_CLOCK'
+  if (today?.clockInTime) return 'WAITING_AFTERNOON'
+  return 'MORNING_CLOCK'
+}
+
+export function hasAttendanceDateChanged(
+  previousDate: string,
+  currentDate: string,
+): boolean {
+  return previousDate !== currentDate
 }
 
 export function calculateDistanceMeters(
