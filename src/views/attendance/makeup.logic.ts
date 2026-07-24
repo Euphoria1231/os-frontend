@@ -1,7 +1,9 @@
+import type { AttendanceStatus } from '../../services/attendance/attendance.types.ts'
+
 export type MakeupActionState = 'AVAILABLE' | 'PENDING' | 'UNAVAILABLE' | 'COMPLETED' | 'HIDDEN'
 
 interface MakeupActionContext {
-  attendanceStatus: 'NORMAL' | 'LATE' | 'MAKEUP'
+  attendanceStatus: AttendanceStatus
   canSubmit: boolean
   hasActiveApplication: boolean
   remainingCount: number | null | undefined
@@ -10,7 +12,10 @@ interface MakeupActionContext {
 export function resolveMakeupActionState(
   context: MakeupActionContext,
 ): MakeupActionState {
-  if (!context.canSubmit || context.attendanceStatus === 'NORMAL') {
+  if (
+    !context.canSubmit
+    || (context.attendanceStatus !== 'LATE' && context.attendanceStatus !== 'MAKEUP')
+  ) {
     return 'HIDDEN'
   }
   if (context.attendanceStatus === 'MAKEUP') {

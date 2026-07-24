@@ -19,6 +19,18 @@ test('有权限且有剩余额度的迟到记录可以申请补签', () => {
   )
 })
 
+test('旷工记录不提供补签操作', () => {
+  assert.equal(
+    resolveMakeupActionState({
+      attendanceStatus: 'ABSENT',
+      canSubmit: true,
+      hasActiveApplication: false,
+      remainingCount: 2,
+    }),
+    'HIDDEN',
+  )
+})
+
 test('已有有效申请或没有额度时不能重复提交补签', () => {
   assert.equal(
     resolveMakeupActionState({
