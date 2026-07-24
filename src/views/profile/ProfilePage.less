@@ -1,0 +1,224 @@
+@import '../../styles/tokens.less';
+
+.profile-page {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.profile-content-grid {
+  display: grid;
+  grid-template-columns: minmax(270px, 330px) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.profile-identity-card.ant-card,
+.profile-detail-card.ant-card,
+.profile-empty-card.ant-card {
+  border: 1px solid @color-slate-200;
+  border-radius: 18px;
+  box-shadow: 0 12px 34px fade(@color-navy-900, 6%);
+}
+
+.profile-identity-card.ant-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 12%, fade(@color-accent-200, 22%), transparent 27%),
+    linear-gradient(155deg, @color-white 0%, #edf6f4 100%);
+  color: @color-navy-900;
+
+  > .ant-card-body {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    min-height: 420px;
+    padding: 42px 30px 30px;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  h3.ant-typography {
+    margin: 18px 0 4px;
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 24px;
+  }
+}
+
+.profile-identity-orbit {
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 290px;
+  height: 290px;
+  border: 1px solid fade(@color-navy-900, 7%);
+  border-radius: 50%;
+
+  &::after {
+    position: absolute;
+    inset: 44px;
+    border: 1px solid fade(@color-navy-900, 6%);
+    border-radius: inherit;
+    content: '';
+  }
+}
+
+.profile-avatar-ring {
+  display: grid;
+  width: 92px;
+  height: 92px;
+  border: 1px solid fade(@color-accent, 24%);
+  border-radius: 28px;
+  background: fade(@color-white, 78%);
+  box-shadow: 0 12px 28px fade(@color-navy-900, 9%);
+  place-items: center;
+  transform: rotate(4deg);
+
+  .ant-avatar {
+    background: linear-gradient(135deg, @color-accent 0%, @color-accent-700 100%);
+    color: @color-white;
+    font-family: @font-display;
+    font-size: 24px;
+    font-weight: 700;
+    transform: rotate(-4deg);
+  }
+}
+
+.profile-employee-number.ant-typography {
+  color: @color-slate-500;
+  font-family: @font-display;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+
+.profile-tags {
+  margin-top: 20px;
+
+  .ant-tag {
+    margin: 0;
+  }
+
+  > .ant-tag:last-child {
+    border: 1px solid @color-slate-200;
+    background: fade(@color-white, 78%);
+    color: @color-navy-800;
+  }
+}
+
+.profile-organization-summary {
+  display: grid;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid @color-slate-200;
+  gap: 12px;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: @color-slate-800;
+    font-size: 12px;
+  }
+
+  .anticon {
+    display: grid;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    background: fade(@color-accent, 10%);
+    color: @color-accent-700;
+    place-items: center;
+  }
+}
+
+.profile-detail-card.ant-card {
+  background: @color-white;
+
+  > .ant-card-body {
+    padding: 30px;
+  }
+}
+
+.profile-detail-heading {
+  display: flex;
+  padding-bottom: 22px;
+  border-bottom: 1px solid @color-slate-200;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+
+  h3.ant-typography {
+    margin: 4px 0 0;
+    color: @color-navy-900;
+    font-family: @font-display;
+    font-size: 21px;
+  }
+
+  > .ant-typography-secondary {
+    font-size: 11px;
+  }
+}
+
+.profile-detail-eyebrow.ant-typography {
+  color: @color-accent-700;
+  font-family: @font-display;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.profile-descriptions {
+  margin-top: 24px;
+
+  .ant-descriptions-view {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .ant-descriptions-row > th,
+  .ant-descriptions-row > td {
+    padding: 14px 16px;
+  }
+
+  .ant-descriptions-item-label {
+    color: @color-slate-500;
+    font-size: 11px;
+  }
+
+  .ant-descriptions-item-content {
+    color: @color-navy-900;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
+.profile-empty-card.ant-card {
+  margin-top: 40px;
+
+  > .ant-card-body {
+    padding: 64px 24px;
+  }
+}
+
+@media (max-width: 860px) {
+  .profile-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-identity-card.ant-card > .ant-card-body {
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 560px) {
+  .profile-detail-card.ant-card > .ant-card-body {
+    padding: 22px 18px;
+  }
+
+  .profile-detail-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+}

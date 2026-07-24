@@ -12,6 +12,7 @@ import {
   TeamOutlined,
   RobotOutlined,
   NotificationOutlined,
+  UserOutlined,
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { canAccessEmployeeSelfServicePath } from '../auth/employee-self-service.logic.ts'
@@ -107,6 +108,11 @@ export const navigationNodes: NavigationNode[] = [
     key: '/operation-logs',
     label: '操作日志',
     icon: <FileSearchOutlined />,
+  },
+  {
+    key: '/profile',
+    label: '个人中心',
+    icon: <UserOutlined />,
   },
 ]
 

@@ -18,6 +18,7 @@ import { IntelligencePage } from './views/intelligence/IntelligencePage.tsx'
 import { OperationLogPage } from './views/operation-log/OperationLogPage.tsx'
 import { PersonalNotificationPage } from './views/notice/PersonalNotificationPage.tsx'
 import { PersonalNotificationProvider } from './hooks/notice/PersonalNotificationProvider.tsx'
+import { ProfilePage } from './views/profile/ProfilePage.tsx'
 
 function App() {
   return (
@@ -115,6 +116,7 @@ function App() {
             }
           />
           <Route path="operation-logs" element={<OperationLogPage />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="foundation" element={<Navigate to="/workspace" replace />} />
           <Route path="*" element={<Navigate to="/workspace" replace />} />
         </Route>
