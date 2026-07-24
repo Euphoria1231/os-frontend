@@ -7,12 +7,16 @@ import type {
   MakeupApplicationRequest,
 } from '../../services/flow/flow.types.ts'
 
-export function useApplications() {
+export function useApplications(enabled = true) {
   const [applications, setApplications] = useState<FlowApplication[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<unknown>(null)
 
   useEffect(() => {
+    if (!enabled) {
+      return
+    }
+
     let active = true
 
     flowService
@@ -37,9 +41,13 @@ export function useApplications() {
     return () => {
       active = false
     }
-  }, [])
+  }, [enabled])
 
   const reload = useCallback(async () => {
+    if (!enabled) {
+      return
+    }
+
     setLoading(true)
     setError(null)
     try {
@@ -49,7 +57,7 @@ export function useApplications() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [enabled])
 
   const submitApplication = useCallback(
     async (type: Exclude<ApplicationType, 'MAKEUP'>, values: ApplicationRequest) => {
@@ -72,5 +80,12 @@ export function useApplications() {
     [reload],
   )
 
-  return { applications, loading, error, reload, submitApplication, submitMakeup }
+  return {
+    applications: enabled ? applications : [],
+    loading: enabled ? loading : false,
+    error: enabled ? error : null,
+    reload,
+    submitApplication,
+    submitMakeup,
+  }
 }

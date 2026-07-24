@@ -20,9 +20,9 @@ export interface WorkspaceUtilityData {
 }
 
 export function useWorkspaceUtilityData(): WorkspaceUtilityData {
-  const { hasAuthority } = useAuth()
+  const { isSuperAdmin, hasAuthority } = useAuth()
   const { applications, loading: applicationLoading, error: applicationError } =
-    useApplications()
+    useApplications(!isSuperAdmin)
   const canViewApprovalTasks = hasAuthority('GET:/api/flow/tasks/**')
   const {
     todo: approvalApplications,

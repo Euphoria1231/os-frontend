@@ -39,13 +39,16 @@ export const AppLayout = memo(function AppLayout() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobile, setMobile] = useState(false)
   const { message } = App.useApp()
-  const { user, roles, hasAuthority, logout } = useAuth()
+  const { user, roles, isSuperAdmin, hasAuthority, logout } = useAuth()
   const { unreadCount } = usePersonalNotificationSummary()
   const location = useLocation()
   const navigate = useNavigate()
-  const navigationItems = useMemo(() => buildNavigationItems(hasAuthority), [hasAuthority])
+  const navigationItems = useMemo(
+    () => buildNavigationItems(hasAuthority, isSuperAdmin),
+    [hasAuthority, isSuperAdmin],
+  )
   const trail = getNavigationTrail(location.pathname)
-  const displayRole = roles.has('SUPER_ADMIN')
+  const displayRole = isSuperAdmin
     ? '系统管理员'
     : roles.has('DEPARTMENT_MANAGER')
       ? '部门主管'

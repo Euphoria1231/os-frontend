@@ -21,6 +21,7 @@ import {
 } from 'antd'
 import { Link } from 'react-router-dom'
 import { WorkspaceUtilityRail } from '../../components/layout/WorkspaceUtilityRail.tsx'
+import { canAccessEmployeeSelfServicePath } from '../../components/auth/employee-self-service.logic.ts'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
 import { useWorkspaceUtilityData } from '../../hooks/workspace/useWorkspaceUtilityData.ts'
 import { getErrorMessage } from '../../utils/error.ts'
@@ -73,11 +74,15 @@ function getGreeting(): string {
 }
 
 export const WorkbenchPage = memo(function WorkbenchPage() {
-  const { user, hasAuthority } = useAuth()
+  const { user, isSuperAdmin, hasAuthority } = useAuth()
   const utilityData = useWorkspaceUtilityData()
   const { tasks, taskLoading, taskError } = utilityData
 
-  const visibleCards = moduleCards.filter((item) => hasAuthority(item.authority))
+  const visibleCards = moduleCards.filter((item) => (
+    hasAuthority(item.authority)
+    && canAccessEmployeeSelfServicePath(item.path, isSuperAdmin)
+  ))
+  const taskListPath = isSuperAdmin ? '/flow/approvals' : '/flow/applications'
   const dateLabel = new Intl.DateTimeFormat('zh-CN', {
     year: 'numeric',
     month: 'long',
@@ -136,7 +141,7 @@ export const WorkbenchPage = memo(function WorkbenchPage() {
                   <Badge count={tasks.length} showZero color="#16745f" />
                 </Flex>
               </div>
-              <Link to="/flow/applications">查看全部</Link>
+              <Link to={taskListPath}>查看全部</Link>
             </div>
 
             {Boolean(taskError) && (

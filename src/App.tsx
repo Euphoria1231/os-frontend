@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { EmployeeSelfServiceRoute } from './components/auth/EmployeeSelfServiceRoute.tsx'
 import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx'
 import { AppLayout } from './components/layout/AppLayout.tsx'
 import { PermissionGate } from './components/permission/PermissionGate.tsx'
@@ -71,17 +72,21 @@ function App() {
           <Route
             path="attendance"
             element={
-              <PermissionGate authority="GET:/api/attendance/**" showDenied>
-                <AttendancePage />
-              </PermissionGate>
+              <EmployeeSelfServiceRoute>
+                <PermissionGate authority="GET:/api/attendance/**" showDenied>
+                  <AttendancePage />
+                </PermissionGate>
+              </EmployeeSelfServiceRoute>
             }
           />
           <Route
             path="flow/applications"
             element={
-              <PermissionGate authority="GET:/api/flow/applications/**" showDenied>
-                <ApplicationPage />
-              </PermissionGate>
+              <EmployeeSelfServiceRoute>
+                <PermissionGate authority="GET:/api/flow/applications/**" showDenied>
+                  <ApplicationPage />
+                </PermissionGate>
+              </EmployeeSelfServiceRoute>
             }
           />
           <Route

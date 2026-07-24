@@ -14,6 +14,7 @@ import {
   NotificationOutlined,
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
+import { canAccessEmployeeSelfServicePath } from '../auth/employee-self-service.logic.ts'
 
 export interface NavigationNode {
   key: string
@@ -112,13 +113,20 @@ export const navigationNodes: NavigationNode[] = [
 function filterNodes(
   nodes: NavigationNode[],
   hasAuthority: (authority: string) => boolean,
+  isSuperAdmin: boolean,
 ): NavigationNode[] {
   return nodes.flatMap((node) => {
+    if (!canAccessEmployeeSelfServicePath(node.key, isSuperAdmin)) {
+      return []
+    }
+
     if (node.authority && !hasAuthority(node.authority)) {
       return []
     }
 
-    const children = node.children ? filterNodes(node.children, hasAuthority) : undefined
+    const children = node.children
+      ? filterNodes(node.children, hasAuthority, isSuperAdmin)
+      : undefined
     if (node.children && !children?.length) {
       return []
     }
@@ -138,8 +146,9 @@ function toMenuItems(nodes: NavigationNode[]): MenuProps['items'] {
 
 export function buildNavigationItems(
   hasAuthority: (authority: string) => boolean,
+  isSuperAdmin = false,
 ): MenuProps['items'] {
-  return toMenuItems(filterNodes(navigationNodes, hasAuthority))
+  return toMenuItems(filterNodes(navigationNodes, hasAuthority, isSuperAdmin))
 }
 
 function findTrail(nodes: NavigationNode[], pathname: string): NavigationNode[] {
