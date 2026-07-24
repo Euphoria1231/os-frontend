@@ -16,6 +16,7 @@ export interface Department extends DepartmentRequest {
 }
 
 export interface PositionRequest {
+  departmentId: number
   code: string
   name: string
   description?: string | null
@@ -24,6 +25,7 @@ export interface PositionRequest {
 
 export interface Position extends PositionRequest {
   id: number
+  departmentName: string | null
   description: string | null
   createdAt: string
   updatedAt: string

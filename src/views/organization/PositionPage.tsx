@@ -27,6 +27,7 @@ import {
 import { PageHeader } from '../../components/common/PageHeader.tsx'
 import { StatusTag } from '../../components/common/StatusTag.tsx'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
+import { useDepartments } from '../../hooks/organization/useDepartments.ts'
 import { usePositions } from '../../hooks/organization/usePositions.ts'
 import type {
   Position,
@@ -36,7 +37,11 @@ import { formatDateTime } from '../../utils/date.ts'
 import { getErrorMessage } from '../../utils/error.ts'
 import './OrganizationPage.less'
 
-const DEFAULT_VALUES: PositionRequest = {
+type PositionFormValues = Omit<PositionRequest, 'departmentId'> & {
+  departmentId?: number
+}
+
+const DEFAULT_VALUES: PositionFormValues = {
   code: '',
   name: '',
   description: null,
@@ -44,7 +49,7 @@ const DEFAULT_VALUES: PositionRequest = {
 }
 
 export const PositionPage = memo(function PositionPage() {
-  const [form] = Form.useForm<PositionRequest>()
+  const [form] = Form.useForm<PositionFormValues>()
   const [editingPosition, setEditingPosition] = useState<Position | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -59,10 +64,14 @@ export const PositionPage = memo(function PositionPage() {
     updatePosition,
     deletePosition,
   } = usePositions()
+  const { departments, loading: departmentsLoading } = useDepartments()
 
   const canCreate = hasAuthority('POST:/api/user/**')
   const canUpdate = hasAuthority('PUT:/api/user/**')
   const canDelete = hasAuthority('DELETE:/api/user/**')
+  const departmentOptions = departments
+    .filter((department) => department.status === 1)
+    .map((department) => ({ label: department.name, value: department.id }))
 
   const openCreateModal = () => {
     setEditingPosition(null)
@@ -73,6 +82,7 @@ export const PositionPage = memo(function PositionPage() {
   const openEditModal = (position: Position) => {
     setEditingPosition(position)
     form.setFieldsValue({
+      departmentId: position.departmentId,
       code: position.code,
       name: position.name,
       description: position.description,
@@ -87,11 +97,16 @@ export const PositionPage = memo(function PositionPage() {
     form.resetFields()
   }
 
-  const handleSubmit = async (values: PositionRequest) => {
+  const handleSubmit = async (values: PositionFormValues) => {
+    if (!values.departmentId) {
+      return
+    }
+
     setSubmitting(true)
     try {
       const payload: PositionRequest = {
         ...values,
+        departmentId: values.departmentId,
         code: values.code.trim().toUpperCase(),
         name: values.name.trim(),
         description: values.description?.trim() || null,
@@ -144,6 +159,14 @@ export const PositionPage = memo(function PositionPage() {
       ellipsis: true,
       render: (description: string | null) =>
         description || <Typography.Text type="secondary">暂无说明</Typography.Text>,
+    },
+    {
+      title: '所属部门',
+      dataIndex: 'departmentName',
+      key: 'departmentName',
+      width: 150,
+      render: (departmentName: string | null, position) =>
+        departmentName ?? `部门 ${position.departmentId}`,
     },
     {
       title: '状态',
@@ -268,7 +291,7 @@ export const PositionPage = memo(function PositionPage() {
           dataSource={positions}
           loading={loading}
           pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (total) => `共 ${total} 个岗位` }}
-          scroll={{ x: 820 }}
+          scroll={{ x: 960 }}
         />
       </Card>
 
@@ -279,13 +302,26 @@ export const PositionPage = memo(function PositionPage() {
         footer={null}
         width={620}
       >
-        <Form<PositionRequest>
+        <Form<PositionFormValues>
           form={form}
           layout="vertical"
           initialValues={DEFAULT_VALUES}
           onFinish={handleSubmit}
           requiredMark="optional"
         >
+          <Form.Item
+            label="所属部门"
+            name="departmentId"
+            rules={[{ required: true, message: '请选择所属部门' }]}
+          >
+            <Select
+              showSearch
+              optionFilterProp="label"
+              options={departmentOptions}
+              loading={departmentsLoading}
+              placeholder="请选择岗位所属部门"
+            />
+          </Form.Item>
           <Row gutter={16}>
             <Col xs={24} sm={12}>
               <Form.Item

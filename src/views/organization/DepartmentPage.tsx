@@ -28,6 +28,7 @@ import {
 import { PageHeader } from '../../components/common/PageHeader.tsx'
 import { StatusTag } from '../../components/common/StatusTag.tsx'
 import { useAuth } from '../../hooks/auth/useAuth.ts'
+import { useEmployees } from '../../hooks/employee/useEmployees.ts'
 import { useDepartments } from '../../hooks/organization/useDepartments.ts'
 import type {
   Department,
@@ -35,6 +36,7 @@ import type {
 } from '../../services/organization/organization.types.ts'
 import { formatDateTime } from '../../utils/date.ts'
 import { getErrorMessage } from '../../utils/error.ts'
+import { getDepartmentEmployeeOptions } from './organization.logic.ts'
 import './OrganizationPage.less'
 
 const DEFAULT_VALUES: DepartmentRequest = {
@@ -61,6 +63,7 @@ export const DepartmentPage = memo(function DepartmentPage() {
     updateDepartment,
     deleteDepartment,
   } = useDepartments()
+  const { employees, loading: employeesLoading } = useEmployees()
 
   const canCreate = hasAuthority('POST:/api/user/**')
   const canUpdate = hasAuthority('PUT:/api/user/**')
@@ -77,6 +80,14 @@ export const DepartmentPage = memo(function DepartmentPage() {
         .map((department) => ({ label: department.name, value: department.id })),
     ],
     [departments, editingDepartment?.id],
+  )
+  const employeeNames = useMemo(
+    () => new Map(employees.map((employee) => [employee.id, employee.realName])),
+    [employees],
+  )
+  const leaderOptions = useMemo(
+    () => getDepartmentEmployeeOptions(employees, editingDepartment?.id),
+    [editingDepartment?.id, employees],
   )
 
   const openCreateModal = () => {
@@ -169,7 +180,9 @@ export const DepartmentPage = memo(function DepartmentPage() {
       dataIndex: 'leaderEmployeeId',
       key: 'leaderEmployeeId',
       render: (leaderEmployeeId: number | null) =>
-        leaderEmployeeId ? `员工 ${leaderEmployeeId}` : <Typography.Text type="secondary">未设置</Typography.Text>,
+        leaderEmployeeId
+          ? employeeNames.get(leaderEmployeeId) ?? `员工 ${leaderEmployeeId}`
+          : <Typography.Text type="secondary">未设置</Typography.Text>,
     },
     {
       title: '排序',
@@ -335,8 +348,16 @@ export const DepartmentPage = memo(function DepartmentPage() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="负责人员工 ID" name="leaderEmployeeId">
-                <InputNumber min={1} precision={0} placeholder="可暂不设置" style={{ width: '100%' }} />
+              <Form.Item label="部门负责人" name="leaderEmployeeId">
+                <Select
+                  allowClear
+                  showSearch
+                  optionFilterProp="label"
+                  options={leaderOptions}
+                  loading={employeesLoading}
+                  disabled={!editingDepartment}
+                  placeholder={editingDepartment ? '请选择本部门在职员工' : '请先创建部门并分配员工'}
+                />
               </Form.Item>
             </Col>
           </Row>

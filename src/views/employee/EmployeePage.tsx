@@ -50,6 +50,11 @@ import { rbacService } from '../../services/rbac/rbac.service.ts'
 import type { Role } from '../../services/rbac/rbac.types.ts'
 import { formatDateTime } from '../../utils/date.ts'
 import { getErrorMessage } from '../../utils/error.ts'
+import {
+  getDepartmentChangeFields,
+  getDepartmentEmployeeOptions,
+  getDepartmentPositionOptions,
+} from '../organization/organization.logic.ts'
 import './EmployeePage.less'
 
 const DEFAULT_VALUES: EmployeeFormValues = {
@@ -75,6 +80,7 @@ interface MakeupQuotaFormValues {
 export const EmployeePage = memo(function EmployeePage() {
   const [form] = Form.useForm<EmployeeFormValues>()
   const [makeupQuotaForm] = Form.useForm<MakeupQuotaFormValues>()
+  const selectedDepartmentId = Form.useWatch('departmentId', form)
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -128,15 +134,18 @@ export const EmployeePage = memo(function EmployeePage() {
   const departmentOptions = departments
     .filter((department) => department.status === 1)
     .map((department) => ({ label: department.name, value: department.id }))
-  const positionOptions = positions
-    .filter((position) => position.status === 1)
-    .map((position) => ({ label: position.name, value: position.id }))
-  const leaderOptions = employees
-    .filter((employee) => employee.status === 1 && employee.id !== editingEmployee?.id)
-    .map((employee) => ({
-      label: `${employee.realName} · ${employee.employeeNo}`,
-      value: employee.id,
-    }))
+  const positionOptions = useMemo(
+    () => getDepartmentPositionOptions(positions, selectedDepartmentId),
+    [positions, selectedDepartmentId],
+  )
+  const leaderOptions = useMemo(
+    () => getDepartmentEmployeeOptions(
+      employees,
+      selectedDepartmentId,
+      editingEmployee?.id,
+    ),
+    [editingEmployee?.id, employees, selectedDepartmentId],
+  )
 
   const openCreateModal = () => {
     setEditingEmployee(null)
@@ -165,6 +174,10 @@ export const EmployeePage = memo(function EmployeePage() {
     setModalOpen(false)
     setEditingEmployee(null)
     form.resetFields()
+  }
+
+  const handleDepartmentChange = (departmentId: number) => {
+    form.setFieldsValue(getDepartmentChangeFields(departmentId))
   }
 
   const handleSubmit = async (values: EmployeeFormValues) => {
@@ -595,7 +608,8 @@ export const EmployeePage = memo(function EmployeePage() {
                   showSearch
                   optionFilterProp="label"
                   options={leaderOptions}
-                  placeholder="可暂不设置"
+                  disabled={!selectedDepartmentId}
+                  placeholder={selectedDepartmentId ? '请选择同部门直属领导' : '请先选择所属部门'}
                 />
               </Form.Item>
             </Col>
@@ -604,12 +618,24 @@ export const EmployeePage = memo(function EmployeePage() {
           <Row gutter={16}>
             <Col xs={24} sm={12}>
               <Form.Item label="所属部门" name="departmentId" rules={[{ required: true, message: '请选择部门' }]}>
-                <Select showSearch optionFilterProp="label" options={departmentOptions} placeholder="请选择部门" />
+                <Select
+                  showSearch
+                  optionFilterProp="label"
+                  options={departmentOptions}
+                  placeholder="请选择部门"
+                  onChange={handleDepartmentChange}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item label="任职岗位" name="positionId" rules={[{ required: true, message: '请选择岗位' }]}>
-                <Select showSearch optionFilterProp="label" options={positionOptions} placeholder="请选择岗位" />
+                <Select
+                  showSearch
+                  optionFilterProp="label"
+                  options={positionOptions}
+                  disabled={!selectedDepartmentId}
+                  placeholder={selectedDepartmentId ? '请选择本部门岗位' : '请先选择所属部门'}
+                />
               </Form.Item>
             </Col>
           </Row>
