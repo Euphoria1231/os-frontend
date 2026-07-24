@@ -6,7 +6,7 @@ import {
 import { Alert, App, Button, Card, Empty, Select, Space, Tag, Typography } from 'antd'
 import { flowService } from '../../services/flow/flow.service.ts'
 import type { FlowApplication } from '../../services/flow/flow.types.ts'
-import { getApprovalCandidates } from '../../services/intelligence/intelligence.logic.ts'
+import { getLeaveApprovalCandidates } from '../../services/intelligence/approval-assistant.logic.ts'
 import { intelligenceService } from '../../services/intelligence/intelligence.service.ts'
 import type { ApprovalAnalysisResponse } from '../../services/intelligence/intelligence.types.ts'
 import { getErrorMessage } from '../../utils/error.ts'
@@ -43,7 +43,7 @@ export function ApprovalAssistantPanel() {
         if (!active) {
           return
         }
-        const candidates = getApprovalCandidates(todoApplications)
+        const candidates = getLeaveApprovalCandidates(todoApplications)
         setApplications(candidates)
         setApplicationsError(null)
         setSelectedApplicationId((current) => (
@@ -98,7 +98,7 @@ export function ApprovalAssistantPanel() {
 
           <Typography.Title level={3}>选择业务单据</Typography.Title>
           <Typography.Paragraph type="secondary">
-            仅展示直属下属的请假、加班待办，不读取本人申请或补签单据。
+            仅展示直属下属的请假待办，辅助意见会结合申请人本月考勤和请假原因生成。
           </Typography.Paragraph>
 
           {Boolean(applicationsError) && (
@@ -120,7 +120,7 @@ export function ApprovalAssistantPanel() {
             size="large"
             loading={loadingApplications}
             value={selectedApplicationId ?? undefined}
-            placeholder="选择请假或加班申请"
+            placeholder="选择请假申请"
             optionLabelProp="label"
             options={applications.map((application) => ({
               value: application.id,
@@ -128,7 +128,7 @@ export function ApprovalAssistantPanel() {
               title: application.reason,
             }))}
             notFoundContent={loadingApplications ? null : (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无直属下属待审批申请" />
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无待审批请假申请" />
             )}
             onChange={setSelectedApplicationId}
           />
