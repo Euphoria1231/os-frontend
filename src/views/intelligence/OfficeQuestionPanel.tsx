@@ -73,7 +73,7 @@ export function OfficeQuestionPanel() {
           />
           <div className="intelligence-question-meta">
             <span className={validationError ? 'is-error' : ''}>
-              {validationError ?? '请勿输入密码、Token 或其他敏感信息'}
+             
             </span>
             <span>{question.length} / 500</span>
           </div>
